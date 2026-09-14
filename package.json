@@ -1,0 +1,20 @@
+{
+  "name": "gmt-tutorial-backend",
+  "version": "2.0.0",
+  "description": "GMT - Genius Mathematics Tutorial by Naresh Kumar Yadav",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

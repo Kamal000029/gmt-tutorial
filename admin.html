@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMT Admin Panel | Genius Mathematics Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Hind:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--saffron:#FF6B00;--deep-blue:#0A1F6E;--gold:#FFD700;--green:#00A651;--red:#e74c3c;--purple:#8b5cf6;--light-bg:#f0f4ff;--card-bg:#fff;--text:#1a1a2e;--muted:#6b7280;--border:#e5e7eb;--radius:12px;--shadow:0 4px 24px rgba(10,31,110,.10);--sidebar-w:260px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Hind',sans-serif;background:var(--light-bg);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+/* LOGIN */
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--deep-blue),#1a3a8f);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:20px;padding:48px 40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+.login-logo{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',cursive;font-size:32px;font-weight:800;color:#fff;margin:0 auto 20px;box-shadow:0 6px 20px rgba(255,107,0,.4)}
+.login-box h2{font-family:'Baloo 2',cursive;font-size:24px;color:var(--deep-blue);margin-bottom:6px}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:28px}
+.login-input{width:100%;padding:13px 16px;margin-bottom:14px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:'Hind',sans-serif;outline:none;transition:border-color .2s}
+.login-input:focus{border-color:var(--saffron)}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--saffron),#ff8c00);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Hind',sans-serif;transition:transform .2s,box-shadow .2s}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,0,.4)}
+.login-error{color:var(--red);font-size:13px;margin-top:10px;display:none}
+/* LAYOUT */
+.sidebar{width:var(--sidebar-w);position:fixed;left:0;top:0;bottom:0;background:var(--deep-blue);color:#fff;display:flex;flex-direction:column;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.2);overflow-y:auto}
+.sidebar-logo{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.s-logo-circle{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;color:#fff;flex-shrink:0}
+.sidebar-logo h3{font-family:'Baloo 2',cursive;font-size:16px;line-height:1.2}
+.sidebar-logo p{font-size:11px;color:#a0b4e8;margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-section{font-size:10px;text-transform:uppercase;color:#5a7aaf;padding:16px 20px 6px;letter-spacing:1px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 20px;color:#a0b4e8;cursor:pointer;transition:background .2s,color .2s;font-size:14px;font-weight:600;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,107,0,.18);color:#fff;border-left-color:var(--saffron)}
+.nav-item .icon{font-size:18px;width:22px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);flex-shrink:0}
+.logout-btn{width:100%;padding:10px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#a0b4e8;border-radius:8px;cursor:pointer;font-size:14px;font-family:'Hind',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,color .2s}
+.logout-btn:hover{background:rgba(231,76,60,.2);color:#fff}
+.main{margin-left:var(--sidebar-w);min-height:100vh}
+.topbar{background:#fff;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:0;z-index:50}
+.topbar h1{font-family:'Baloo 2',cursive;font-size:20px;color:var(--deep-blue)}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.admin-tag{background:linear-gradient(135deg,var(--deep-blue),#1a3a8f);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
+.content{padding:28px}
+.page{display:none}.page.active{display:block}
+/* CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.stat-card .icon{font-size:28px}
+.stat-card .label{font-size:13px;color:var(--muted)}
+.stat-card .value{font-size:28px;font-weight:700;font-family:'Baloo 2',cursive;color:var(--deep-blue)}
+.stat-card .sub{font-size:12px;color:var(--green);font-weight:600}
+/* BUTTONS */
+.btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Hind',sans-serif;display:inline-flex;align-items:center;gap:7px;transition:transform .15s,box-shadow .15s;text-decoration:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.btn-primary{background:linear-gradient(135deg,var(--saffron),#ff8c00);color:#fff}
+.btn-blue{background:linear-gradient(135deg,var(--deep-blue),#1a3a8f);color:#fff}
+.btn-green{background:linear-gradient(135deg,var(--green),#00c96a);color:#fff}
+.btn-red{background:linear-gradient(135deg,var(--red),#c0392b);color:#fff}
+.btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--saffron);color:var(--saffron)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-xs{padding:5px 10px;font-size:12px}
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.sec-header h2{font-family:'Baloo 2',cursive;font-size:22px;color:var(--deep-blue)}
+/* FILTER BAR */
+.filter-bar{background:#fff;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-bar input,.filter-bar select{padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Hind',sans-serif;outline:none;transition:border-color .2s}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--saffron)}
+.filter-bar input{flex:1;min-width:200px}
+/* TABLE */
+.table-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+table{width:100%;border-collapse:collapse}
+th{background:#f8fafc;padding:12px 16px;text-align:left;font-size:13px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.td-actions{display:flex;gap:6px;flex-wrap:wrap}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-gray{background:#f3f4f6;color:#4b5563}
+.badge-gold{background:#fef3c7;color:#92400e}
+/* UPLOAD ZONE */
+.upload-zone{border:2.5px dashed var(--border);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafbff}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--saffron);background:#fff8f3}
+.upload-zone .icon{font-size:48px;margin-bottom:12px}
+.upload-zone h3{font-family:'Baloo 2',cursive;font-size:18px;color:var(--deep-blue);margin-bottom:6px}
+.upload-zone p{font-size:13px;color:var(--muted)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.modal-header{padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-family:'Baloo 2',cursive;font-size:20px;color:var(--deep-blue)}
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);padding:4px}
+.modal-body{padding:20px 28px 28px}
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.form-control{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Hind',sans-serif;outline:none;transition:border-color .2s}
+.form-control:focus{border-color:var(--saffron)}
+textarea.form-control{resize:vertical;min-height:90px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* PROGRESS */
+.prog-wrap{margin-top:12px}
+.prog-bar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--gold));transition:width .3s;width:0}
+.prog-text{font-size:12px;color:var(--muted);margin-top:4px}
+/* TOAST */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:14px 20px;border-radius:12px;color:#fff;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;min-width:260px;animation:slideIn .3s ease}
+.toast-success{background:var(--green)}.toast-error{background:var(--red)}.toast-info{background:var(--deep-blue)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+/* GALLERY */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.gallery-item{border-radius:var(--radius);overflow:hidden;position:relative;background:#fff;box-shadow:var(--shadow)}
+.gallery-item img{width:100%;height:130px;object-fit:cover;display:block}
+.gallery-item .gal-actions{position:absolute;top:8px;right:8px;display:flex;gap:6px;opacity:0;transition:opacity .2s}
+.gallery-item:hover .gal-actions{opacity:1}
+.gallery-item .gal-caption{padding:8px 10px;font-size:12px;color:var(--muted)}
+/* NOTICE */
+.notice-card{background:#fff;border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:12px;display:flex;align-items:flex-start;gap:14px}
+.notice-type{width:10px;border-radius:3px;align-self:stretch;flex-shrink:0}
+.nt-info{background:var(--deep-blue)}.nt-warning{background:#f59e0b}.nt-success{background:var(--green)}.nt-urgent{background:var(--red)}
+.notice-body{flex:1}
+.notice-body h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.notice-body p{font-size:13px;color:var(--muted)}
+.notice-meta{font-size:12px;color:var(--muted);margin-top:6px}
+/* RECENT */
+.recent-section{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.widget{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.widget h3{font-family:'Baloo 2',cursive;font-size:16px;color:var(--deep-blue);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.widget-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.widget-row:last-child{border-bottom:none}
+.widget-row .title{flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-row .meta{font-size:12px;color:var(--muted);flex-shrink:0}
+/* MOBILE */
+.menu-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer;padding:8px;color:var(--deep-blue)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+.overlay.show{display:block}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .topbar{padding:0 16px}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .recent-section{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .menu-toggle{display:flex}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">G</div>
+    <h2>GMT Admin Panel</h2>
+    <p>Genius Mathematics Tutorial — Naresh Kumar Yadav</p>
+    <input class="login-input" type="text" id="loginUser" placeholder="Username" autocomplete="username">
+    <input class="login-input" type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">🔐 Login</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div class="overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="s-logo-circle">G</div>
+    <div><h3>GMT Admin</h3><p>Genius Maths Tutorial</p></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-section">Resources</div>
+    <div class="nav-item" onclick="showPage('upload')" data-page="upload"><span class="icon">📤</span> Upload Files</div>
+    <div class="nav-item" onclick="showPage('resources')" data-page="resources"><span class="icon">📚</span> All Resources</div>
+    <div class="nav-item" onclick="showPage('gallery')" data-page="gallery"><span class="icon">🖼️</span> Gallery</div>
+    <div class="nav-section">Students</div>
+    <div class="nav-item" onclick="showPage('admissions')" data-page="admissions"><span class="icon">📋</span> Admissions <span class="nav-badge hidden" id="admBadge">0</span></div>
+    <div class="nav-section">Website</div>
+    <div class="nav-item" onclick="showPage('notices')" data-page="notices"><span class="icon">📢</span> Notices</div>
+    <div class="nav-item" onclick="showPage('testimonials')" data-page="testimonials"><span class="icon">⭐</span> Testimonials</div>
+    <div class="nav-item" onclick="showPage('settings')" data-page="settings"><span class="icon">⚙️</span> Settings</div>
+  </nav>
+  <div class="sidebar-footer"><button class="logout-btn" onclick="doLogout()">🚪 Logout</button></div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="menu-toggle" onclick="openSidebar()">☰</button>
+      <h1 id="pageTitle">Dashboard</h1>
+    </div>
+    <div class="topbar-right">
+      <a href="/" target="_blank" class="btn btn-ghost btn-sm">🌐 View Site</a>
+      <span class="admin-tag" id="adminTag">Admin</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="icon">📚</div><div class="label">Total Resources</div><div class="value" id="s-total">—</div></div>
+        <div class="stat-card"><div class="icon">📥</div><div class="label">Downloads</div><div class="value" id="s-dl">—</div></div>
+        <div class="stat-card"><div class="icon">📋</div><div class="label">Admissions</div><div class="value" id="s-adm">—</div><div class="sub" id="s-new-adm"></div></div>
+        <div class="stat-card"><div class="icon">👁️</div><div class="label">Total Views</div><div class="value" id="s-views">—</div></div>
+        <div class="stat-card"><div class="icon">📄</div><div class="label">PDFs</div><div class="value" id="s-pdfs">—</div></div>
+        <div class="stat-card"><div class="icon">📝</div><div class="label">Notes</div><div class="value" id="s-notes">—</div></div>
+        <div class="stat-card"><div class="icon">❓</div><div class="label">Question Papers</div><div class="value" id="s-qp">—</div></div>
+        <div class="stat-card"><div class="icon">💾</div><div class="label">Storage Used</div><div class="value" id="s-storage" style="font-size:18px">—</div></div>
+      </div>
+      <div class="recent-section">
+        <div class="widget"><h3>📚 Recent Uploads</h3><div id="recentResources"><span style="color:var(--muted);font-size:13px">Loading…</span></div></div>
+        <div class="widget"><h3>📋 Recent Admissions</h3><div id="recentAdmissions"><span style="color:var(--muted);font-size:13px">Loading…</span></div></div>
+      </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="sec-header">
+        <h2>📤 Upload Files</h2>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('resources')">📚 View All</button>
+      </div>
+      <div style="background:#fff;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+          <div class="icon">📂</div>
+          <h3>Drag & Drop Files Here</h3>
+          <p>PDF, DOC, DOCX, PPT, PPTX, TXT, JPG, PNG, MP4, EPUB and more</p>
+          <p style="margin-top:8px;font-weight:700;color:var(--saffron)">Max size: 100 MB per file</p>
+          <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.epub,.jpg,.jpeg,.png,.gif,.webp,.mp4,.webm,.ogg,.svg" onchange="onFilesPicked(event)" style="display:none">
+        </div>
+        <div id="fileQueue" style="margin-top:20px;display:none">
+          <h4 style="margin-bottom:12px;color:var(--deep-blue)">Selected Files <span id="queueCount" style="color:var(--muted);font-size:13px;font-weight:400"></span></h4>
+          <div id="queueList"></div>
+        </div>
+        <div id="uploadForm" style="margin-top:24px;display:none">
+          <h4 style="margin-bottom:16px;color:var(--deep-blue)">📝 File Details</h4>
+          <div class="form-row">
+            <div class="form-group"><label>Title *</label><input class="form-control" id="up-title" placeholder="e.g. Class 10 Algebra Notes"></div>
+            <div class="form-group"><label>Type *</label>
+              <select class="form-control" id="up-type">
+                <option value="pdf">📄 PDF Document</option>
+                <option value="note">📝 Study Notes</option>
+                <option value="question">❓ Question Paper</option>
+                <option value="solution">✅ Solution / Answer Key</option>
+                <option value="syllabus">📋 Syllabus</option>
+                <option value="book">📖 Book / eBook</option>
+                <option value="ppt">📊 Presentation (PPT)</option>
+                <option value="image">🖼️ Image</option>
+                <option value="video">🎬 Video Lecture</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Class</label>
+              <select class="form-control" id="up-class">
+                <option value="all">All Classes</option>
+                <option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option>
+                <option value="9">Class 9</option><option value="10">Class 10</option>
+                <option value="11">Class 11</option><option value="12">Class 12</option>
+                <option value="competitive">Competitive Exams</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Subject</label><input class="form-control" id="up-subject" placeholder="e.g. Mathematics, Science"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Year</label><input class="form-control" id="up-year" placeholder="e.g. 2024, 2025"></div>
+            <div class="form-group"><label>Chapter / Topic</label><input class="form-control" id="up-chapter" placeholder="e.g. Chapter 3 - Triangles"></div>
+          </div>
+          <div class="form-group"><label>Description</label><textarea class="form-control" id="up-desc" rows="3" placeholder="Brief description…"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" id="up-tags" placeholder="algebra, formula, important"></div>
+            <div class="form-group"><label>Language</label>
+              <select class="form-control" id="up-lang">
+                <option>Hindi/English</option><option>Hindi</option><option>English</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:10px">
+            <input type="checkbox" id="up-pin" style="width:18px;height:18px;cursor:pointer">
+            <label for="up-pin" style="cursor:pointer;margin:0;font-weight:600">📌 Pin this resource (show at top for students)</label>
+          </div>
+          <div class="prog-wrap" id="uploadProgress" style="display:none">
+            <div class="prog-bar"><div class="prog-fill" id="progressFill"></div></div>
+            <div class="prog-text" id="progressText">Uploading…</div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="startUpload()">📤 Upload Now</button>
+            <button class="btn btn-ghost" onclick="clearUpload()">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="page" id="page-resources">
+      <div class="sec-header">
+        <h2>📚 All Resources</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="showPage('upload')">📤 Upload New</button>
+          <button class="btn btn-red btn-sm hidden" id="bulkDeleteBtn" onclick="bulkDelete()">🗑️ Delete Selected</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="res-search" placeholder="🔍 Search…" oninput="loadResources()">
+        <select id="res-type" onchange="loadResources()">
+          <option value="">All Types</option>
+          <option value="pdf">PDF</option><option value="note">Notes</option>
+          <option value="question">Question Paper</option><option value="solution">Solution</option>
+          <option value="syllabus">Syllabus</option><option value="book">Book</option>
+          <option value="ppt">Presentation</option><option value="image">Image</option><option value="video">Video</option>
+        </select>
+        <select id="res-class" onchange="loadResources()">
+          <option value="">All Classes</option>
+          <option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option>
+          <option value="9">Class 9</option><option value="10">Class 10</option>
+          <option value="11">Class 11</option><option value="12">Class 12</option>
+          <option value="competitive">Competitive</option><option value="all">All</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="loadResources()">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+            <th>Title</th><th>Type</th><th>Class</th><th>Subject</th>
+            <th>Size</th><th>DL</th><th>Views</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="resourcesBody"><tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="page" id="page-gallery">
+      <div class="sec-header">
+        <h2>🖼️ Photo Gallery</h2>
+        <button class="btn btn-primary" onclick="document.getElementById('galleryUploadModal').classList.remove('hidden')">📸 Upload Images</button>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"><div style="color:var(--muted);padding:40px">Loading…</div></div>
+      <!-- Gallery Upload Modal -->
+      <div class="modal-overlay hidden" id="galleryUploadModal">
+        <div class="modal">
+          <div class="modal-header"><h3>📸 Upload Gallery Images</h3><button class="modal-close" onclick="document.getElementById('galleryUploadModal').classList.add('hidden')">×</button></div>
+          <div class="modal-body">
+            <div class="upload-zone" onclick="document.getElementById('galleryInput').click()">
+              <div class="icon">🖼️</div><h3>Click to select images</h3>
+              <p>JPG, PNG, GIF, WEBP — Max 10MB each — Up to 30 at once</p>
+            </div>
+            <input type="file" id="galleryInput" multiple accept=".jpg,.jpeg,.png,.gif,.webp" style="display:none" onchange="uploadGallery(event)">
+            <div class="form-group" style="margin-top:16px"><label>Caption</label><input class="form-control" id="gal-caption" placeholder="e.g. Annual Prize Distribution 2024"></div>
+            <div class="form-group"><label>Category</label>
+              <select class="form-control" id="gal-category">
+                <option value="general">General</option><option value="events">Events</option>
+                <option value="students">Students</option><option value="results">Results</option><option value="classroom">Classroom</option>
+              </select>
+            </div>
+            <div class="prog-wrap hidden" id="galProg"><div class="prog-bar"><div class="prog-fill" id="galFill"></div></div><div class="prog-text" id="galText"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMISSIONS -->
+    <div class="page" id="page-admissions">
+      <div class="sec-header">
+        <h2>📋 Admission Applications</h2>
+        <select class="btn btn-ghost btn-sm" id="adm-filter" onchange="loadAdmissions()" style="font-weight:600">
+          <option value="">All Status</option><option value="new">🔵 New</option>
+          <option value="contacted">🟡 Contacted</option><option value="enrolled">🟢 Enrolled</option><option value="rejected">🔴 Rejected</option>
+        </select>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="adm-search" placeholder="🔍 Search by name, mobile, village…" oninput="loadAdmissions()">
+        <button class="btn btn-ghost btn-sm" onclick="loadAdmissions()">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Class</th><th>Mobile</th><th>Village</th><th>School</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admissionsBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTICES -->
+    <div class="page" id="page-notices">
+      <div class="sec-header"><h2>📢 Notices</h2><button class="btn btn-primary" onclick="openNoticeModal()">➕ Add Notice</button></div>
+      <div id="noticesList"><div style="color:var(--muted);padding:20px">Loading…</div></div>
+      <div class="modal-overlay hidden" id="noticeModal">
+        <div class="modal">
+          <div class="modal-header"><h3 id="noticeMTitle">Add Notice</h3><button class="modal-close" onclick="document.getElementById('noticeModal').classList.add('hidden')">×</button></div>
+          <div class="modal-body">
+            <div class="form-group"><label>Title *</label><input class="form-control" id="nt-title" placeholder="Notice title…"></div>
+            <div class="form-group"><label>Message</label><textarea class="form-control" id="nt-body" rows="4" placeholder="Notice details…"></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label>Type</label>
+                <select class="form-control" id="nt-type">
+                  <option value="info">ℹ️ Info</option><option value="warning">⚠️ Warning</option>
+                  <option value="success">✅ Success/Good News</option><option value="urgent">🚨 Urgent</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Expires On (optional)</label><input class="form-control" type="date" id="nt-expires"></div>
+            </div>
+            <input type="hidden" id="nt-id">
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn btn-primary" onclick="saveNotice()">💾 Save</button>
+              <button class="btn btn-ghost" onclick="document.getElementById('noticeModal').classList.add('hidden')">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TESTIMONIALS -->
+    <div class="page" id="page-testimonials">
+      <div class="sec-header"><h2>⭐ Testimonials</h2><button class="btn btn-primary" onclick="openTestimonialModal()">➕ Add</button></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Class</th><th>Rating</th><th>Text</th><th>Visible</th><th>Actions</th></tr></thead>
+          <tbody id="testimonialsBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="modal-overlay hidden" id="testimonialModal">
+        <div class="modal">
+          <div class="modal-header"><h3>Add Testimonial</h3><button class="modal-close" onclick="document.getElementById('testimonialModal').classList.add('hidden')">×</button></div>
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group"><label>Student Name *</label><input class="form-control" id="tm-name" placeholder="e.g. Rahul Kumar"></div>
+              <div class="form-group"><label>Class</label>
+                <select class="form-control" id="tm-class"><option value="">Select</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>School</label><input class="form-control" id="tm-school" placeholder="School name"></div>
+              <div class="form-group"><label>Rating</label>
+                <select class="form-control" id="tm-rating"><option value="5">⭐⭐⭐⭐⭐ 5</option><option value="4">⭐⭐⭐⭐ 4</option><option value="3">⭐⭐⭐ 3</option></select>
+              </div>
+            </div>
+            <div class="form-group"><label>Testimonial *</label><textarea class="form-control" id="tm-text" rows="4" placeholder="What the student said…"></textarea></div>
+            <input type="hidden" id="tm-id">
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn btn-primary" onclick="saveTestimonial()">💾 Save</button>
+              <button class="btn btn-ghost" onclick="document.getElementById('testimonialModal').classList.add('hidden')">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <h2 style="font-family:'Baloo 2',cursive;font-size:22px;color:var(--deep-blue);margin-bottom:20px">⚙️ Settings</h2>
+      <div style="background:#fff;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);max-width:640px;margin-bottom:20px">
+        <h4 style="margin-bottom:18px;color:var(--deep-blue)">🏫 Site Information</h4>
+        <div class="form-group"><label>Site Name</label><input class="form-control" id="set-name" placeholder="GMT Tutorial"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Owner Name</label><input class="form-control" id="set-owner" placeholder="Naresh Kumar Yadav"></div>
+          <div class="form-group"><label>Phone</label><input class="form-control" id="set-phone" placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="form-group"><label>Email</label><input class="form-control" id="set-email" type="email" placeholder="admin@gmttutorial.com"></div>
+        <div class="form-group"><label>Address</label><textarea class="form-control" id="set-address" rows="2"></textarea></div>
+        <div class="form-group"><label>About Text</label><textarea class="form-control" id="set-about" rows="3"></textarea></div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+      </div>
+      <div style="background:#fff;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);max-width:640px">
+        <h4 style="margin-bottom:18px;color:var(--deep-blue)">🔑 Change Password</h4>
+        <div class="form-group"><label>Current Password</label><input class="form-control" type="password" id="set-cur-pass"></div>
+        <div class="form-group"><label>New Password (min 8 chars)</label><input class="form-control" type="password" id="set-new-pass"></div>
+        <button class="btn btn-blue" onclick="changePassword()">🔒 Update Password</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay hidden" id="editModal">
+  <div class="modal">
+    <div class="modal-header"><h3>✏️ Edit Resource</h3><button class="modal-close" onclick="document.getElementById('editModal').classList.add('hidden')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="form-group"><label>Title *</label><input class="form-control" id="edit-title"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Class</label>
+          <select class="form-control" id="edit-class">
+            <option value="all">All Classes</option><option value="6">Class 6</option><option value="7">Class 7</option>
+            <option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option>
+            <option value="11">Class 11</option><option value="12">Class 12</option><option value="competitive">Competitive</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Subject</label><input class="form-control" id="edit-subject"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Year</label><input class="form-control" id="edit-year"></div>
+        <div class="form-group"><label>Chapter / Topic</label><input class="form-control" id="edit-chapter"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea class="form-control" id="edit-desc" rows="3"></textarea></div>
+      <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" id="edit-tags"></div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button class="btn btn-primary" onclick="saveEdit()">💾 Save</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('editModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMISSION DETAIL MODAL -->
+<div class="modal-overlay hidden" id="admModal">
+  <div class="modal">
+    <div class="modal-header"><h3>📋 Admission Details</h3><button class="modal-close" onclick="document.getElementById('admModal').classList.add('hidden')">×</button></div>
+    <div class="modal-body" id="admModalBody"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────
+let selectedFiles=[];
+function toast(msg,type='success'){const c=document.getElementById('toast-container');const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;c.appendChild(t);setTimeout(()=>t.remove(),4000);}
+function fmtDate(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtBytes(b){if(!b)return'0 B';const k=1024,s=['B','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(k));return(b/Math.pow(k,i)).toFixed(1)+' '+s[i];}
+function typeIcon(t){return{pdf:'📄',note:'📝',question:'❓',solution:'✅',syllabus:'📋',book:'📖',ppt:'📊',image:'🖼️',video:'🎬'}[t]||'📁';}
+function typeBadge(t){return{pdf:'red',note:'blue',question:'purple',solution:'green',syllabus:'orange',book:'gold',ppt:'orange',image:'green',video:'purple'}[t]||'gray';}
+function statusBadge(s){return{new:'blue',contacted:'orange',enrolled:'green',rejected:'red'}[s]||'gray';}
+function fileIconByExt(name){const ext=name.split('.').pop().toLowerCase();if(ext==='pdf')return'📄';if(['doc','docx','rtf'].includes(ext))return'📝';if(['ppt','pptx'].includes(ext))return'📊';if(['jpg','jpeg','png','gif','webp','svg'].includes(ext))return'🖼️';if(['mp4','webm','ogg','mov'].includes(ext))return'🎬';if(ext==='epub')return'📖';return'📁';}
+
+// ── Auth ─────────────────────────────────────────────────────────────
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginError'); errEl.style.display='none';
+  try{
+    const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(d.success){document.getElementById('loginOverlay').style.display='none';document.getElementById('adminTag').textContent=d.username;initApp();}
+    else{errEl.textContent=d.error||'Login failed';errEl.style.display='block';}
+  }catch{errEl.textContent='Connection error';errEl.style.display='block';}
+}
+async function doLogout(){await fetch('/api/admin/logout',{method:'POST',credentials:'include'});location.reload();}
+async function checkAuth(){
+  try{const r=await fetch('/api/admin/check',{credentials:'include'});const d=await r.json();
+    if(d.isAdmin){document.getElementById('loginOverlay').style.display='none';if(d.username)document.getElementById('adminTag').textContent=d.username;initApp();}
+  }catch{}
+}
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ── Init ─────────────────────────────────────────────────────────────
+function initApp(){loadDashboard();loadSettings();}
+
+// ── Pages ─────────────────────────────────────────────────────────────
+const PAGE_TITLES={dashboard:'Dashboard',upload:'Upload Files',resources:'All Resources',gallery:'Gallery',admissions:'Admissions',notices:'Notices',testimonials:'Testimonials',settings:'Settings'};
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p)?.classList.add('active');
+  document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('active');
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[p]||p;
+  closeSidebar();
+  if(p==='dashboard')loadDashboard();
+  if(p==='resources')loadResources();
+  if(p==='gallery')loadGallery();
+  if(p==='admissions')loadAdmissions();
+  if(p==='notices')loadNotices();
+  if(p==='testimonials')loadTestimonials();
+  if(p==='settings')loadSettings();
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
+
+// ── Dashboard ─────────────────────────────────────────────────────────
+async function loadDashboard(){
+  try{
+    const d=await(await fetch('/api/admin/stats',{credentials:'include'})).json();
+    document.getElementById('s-total').textContent=d.totalResources||0;
+    document.getElementById('s-dl').textContent=d.totalDownloads||0;
+    document.getElementById('s-adm').textContent=d.totalAdmissions||0;
+    document.getElementById('s-views').textContent=d.totalViews||0;
+    document.getElementById('s-pdfs').textContent=d.typeBreakdown?.pdf||0;
+    document.getElementById('s-notes').textContent=d.typeBreakdown?.note||0;
+    document.getElementById('s-qp').textContent=d.typeBreakdown?.question||0;
+    document.getElementById('s-storage').textContent=d.storageUsed||'—';
+    if(d.newAdmissions>0){document.getElementById('s-new-adm').textContent=`+${d.newAdmissions} new`;const b=document.getElementById('admBadge');b.textContent=d.newAdmissions;b.classList.remove('hidden');}
+    const rr=document.getElementById('recentResources');
+    rr.innerHTML=(d.recentResources||[]).length?d.recentResources.map(r=>`<div class="widget-row"><span>${typeIcon(r.type)}</span><span class="title">${r.title}</span><span class="meta">${r.sizeLabel||''}</span></div>`).join(''):'<div style="color:var(--muted);font-size:13px">No resources yet.</div>';
+    const ra=document.getElementById('recentAdmissions');
+    ra.innerHTML=(d.recentAdmissions||[]).length?d.recentAdmissions.map(a=>`<div class="widget-row"><span>👤</span><span class="title">${a.name} — Class ${a.class}</span><span class="badge badge-${statusBadge(a.status)}">${a.status}</span></div>`).join(''):'<div style="color:var(--muted);font-size:13px">No admissions yet.</div>';
+  }catch(e){console.error(e);}
+}
+
+// ── Upload ─────────────────────────────────────────────────────────────
+function onDragOver(e){e.preventDefault();document.getElementById('uploadZone').classList.add('dragover');}
+function onDragLeave(){document.getElementById('uploadZone').classList.remove('dragover');}
+function onDrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('dragover');handleFiles([...e.dataTransfer.files]);}
+function onFilesPicked(e){handleFiles([...e.target.files]);}
+function handleFiles(files){
+  selectedFiles=files;
+  if(!files.length)return;
+  document.getElementById('fileQueue').style.display='';
+  document.getElementById('uploadForm').style.display='';
+  document.getElementById('queueCount').textContent=`(${files.length} file${files.length>1?'s':''})`;
+  document.getElementById('queueList').innerHTML=files.map((f,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;margin-bottom:8px"><span style="font-size:22px">${fileIconByExt(f.name)}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div><div style="font-size:12px;color:var(--muted)">${fmtBytes(f.size)}</div></div><button onclick="removeFile(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px">✕</button></div>`).join('');
+  if(files.length===1&&!document.getElementById('up-title').value){document.getElementById('up-title').value=files[0].name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');}
+}
+function removeFile(i){const a=[...selectedFiles];a.splice(i,1);if(!a.length){clearUpload();return;}handleFiles(a);}
+function clearUpload(){selectedFiles=[];document.getElementById('fileInput').value='';document.getElementById('fileQueue').style.display='none';document.getElementById('uploadForm').style.display='none';['up-title','up-desc','up-tags','up-year','up-chapter'].forEach(id=>document.getElementById(id).value='');document.getElementById('uploadProgress').style.display='none';}
+async function startUpload(){
+  if(!selectedFiles.length){toast('Please select a file.','error');return;}
+  const title=document.getElementById('up-title').value.trim();
+  if(!title&&selectedFiles.length===1){toast('Please enter a title.','error');return;}
+  const prog=document.getElementById('uploadProgress'),fill=document.getElementById('progressFill'),text=document.getElementById('progressText');
+  prog.style.display=''; fill.style.width='0%'; text.textContent='Preparing…';
+  const meta={title,description:document.getElementById('up-desc').value.trim(),classLevel:document.getElementById('up-class').value,subject:document.getElementById('up-subject').value.trim(),type:document.getElementById('up-type').value,tags:document.getElementById('up-tags').value.trim(),year:document.getElementById('up-year').value.trim(),chapter:document.getElementById('up-chapter').value.trim(),language:document.getElementById('up-lang').value,isPinned:document.getElementById('up-pin').checked.toString()};
+  const fd=new FormData();
+  const isMulti=selectedFiles.length>1;
+  if(isMulti){selectedFiles.forEach(f=>fd.append('files',f));}else{fd.append('file',selectedFiles[0]);}
+  Object.entries(meta).forEach(([k,v])=>fd.append(k,v));
+  let pct=0; const tick=setInterval(()=>{pct=Math.min(pct+Math.random()*8,85);fill.style.width=pct+'%';text.textContent=`Uploading… ${Math.round(pct)}%`;},200);
+  try{
+    const res=await fetch(isMulti?'/api/admin/resources/upload-bulk':'/api/admin/resources/upload',{method:'POST',credentials:'include',body:fd});
+    clearInterval(tick); const data=await res.json();
+    if(data.success){fill.style.width='100%';text.textContent=isMulti?`✅ ${data.count} files uploaded!`:'✅ Uploaded!';toast(isMulti?`${data.count} files uploaded!`:'File uploaded!');setTimeout(()=>{clearUpload();showPage('resources');},1500);}
+    else{fill.style.width='0';text.textContent='❌ '+data.error;toast(data.error||'Upload failed','error');}
+  }catch{clearInterval(tick);text.textContent='❌ Network error';toast('Upload failed','error');}
+}
+
+// ── Resources ─────────────────────────────────────────────────────────
+async function loadResources(){
+  const search=document.getElementById('res-search').value,type=document.getElementById('res-type').value,cls=document.getElementById('res-class').value;
+  let url='/api/admin/resources?';
+  if(search)url+=`search=${encodeURIComponent(search)}&`;
+  if(type)url+=`type=${type}&`;
+  if(cls)url+=`class=${cls}&`;
+  try{
+    const r=await(await fetch(url,{credentials:'include'})).json();
+    const tbody=document.getElementById('resourcesBody');
+    if(!r.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">No resources found.</td></tr>';return;}
+    tbody.innerHTML=r.map(x=>`<tr data-id="${x.id}">
+      <td><input type="checkbox" class="res-check" value="${x.id}" onchange="updateBulkBar()"></td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${typeIcon(x.type)}</span><div><div style="font-weight:700;font-size:13px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.isPinned?'📌 ':''}${x.title}</div><div style="font-size:12px;color:var(--muted)">${x.originalName||''}</div></div></div></td>
+      <td><span class="badge badge-${typeBadge(x.type)}">${x.typeLabel||x.type}</span></td>
+      <td>${x.class==='all'?'All':'Class '+x.class}</td>
+      <td style="font-size:13px">${x.subject||'—'}</td>
+      <td style="font-size:13px">${x.sizeLabel||'—'}</td>
+      <td style="font-size:13px">${x.downloads||0}</td>
+      <td style="font-size:13px">${x.views||0}</td>
+      <td><span class="badge ${x.visible!==false?'badge-green':'badge-red'}" style="cursor:pointer" onclick="toggleVis('${x.id}',${x.visible!==false})">${x.visible!==false?'✅ Visible':'👁️ Hidden'}</span></td>
+      <td><div class="td-actions">
+        <button class="btn btn-ghost btn-xs" onclick='openEdit(${JSON.stringify(x)})'>✏️</button>
+        <a class="btn btn-blue btn-xs" href="/api/download/${x.id}" target="_blank">📥</a>
+        <button class="btn btn-red btn-xs" onclick="delRes('${x.id}','${x.title.replace(/'/g,"\\'")}')">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  }catch{toast('Failed to load','error');}
+}
+function updateBulkBar(){const n=document.querySelectorAll('.res-check:checked').length;const b=document.getElementById('bulkDeleteBtn');b.classList.toggle('hidden',n===0);}
+function toggleSelectAll(cb){document.querySelectorAll('.res-check').forEach(c=>c.checked=cb.checked);updateBulkBar();}
+async function toggleVis(id,isVis){const r=await fetch(`/api/admin/resources/${id}`,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({visible:!isVis})});const d=await r.json();if(d.success){toast(`Resource ${!isVis?'shown':'hidden'}.`);loadResources();};}
+async function delRes(id,title){if(!confirm(`Delete "${title}"?`))return;const r=await fetch(`/api/admin/resources/${id}`,{method:'DELETE',credentials:'include'});const d=await r.json();if(d.success){toast('Deleted.');loadResources();loadDashboard();}else toast(d.error,'error');}
+async function bulkDelete(){const ids=[...document.querySelectorAll('.res-check:checked')].map(c=>c.value);if(!ids.length)return;if(!confirm(`Delete ${ids.length} resources?`))return;const r=await fetch('/api/admin/resources/bulk-delete',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});const d=await r.json();if(d.success){toast(`${d.deleted} deleted.`);loadResources();}}
+function openEdit(r){document.getElementById('edit-id').value=r.id;document.getElementById('edit-title').value=r.title;document.getElementById('edit-class').value=r.class;document.getElementById('edit-subject').value=r.subject||'';document.getElementById('edit-year').value=r.year||'';document.getElementById('edit-chapter').value=r.chapter||'';document.getElementById('edit-desc').value=r.description||'';document.getElementById('edit-tags').value=(r.tags||[]).join(', ');document.getElementById('editModal').classList.remove('hidden');}
+async function saveEdit(){const id=document.getElementById('edit-id').value,body={title:document.getElementById('edit-title').value.trim(),class:document.getElementById('edit-class').value,subject:document.getElementById('edit-subject').value.trim(),year:document.getElementById('edit-year').value.trim(),chapter:document.getElementById('edit-chapter').value.trim(),description:document.getElementById('edit-desc').value.trim(),tags:document.getElementById('edit-tags').value.split(',').map(t=>t.trim()).filter(Boolean)};const r=await fetch(`/api/admin/resources/${id}`,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.success){toast('Updated!');document.getElementById('editModal').classList.add('hidden');loadResources();}else toast(d.error,'error');}
+
+// ── Gallery ─────────────────────────────────────────────────────────
+async function loadGallery(){
+  try{
+    const items=await(await fetch('/api/admin/gallery',{credentials:'include'})).json();
+    const grid=document.getElementById('galleryGrid');
+    if(!items.length){grid.innerHTML='<div style="color:var(--muted);padding:40px">No images yet.</div>';return;}
+    grid.innerHTML=items.map(g=>`<div class="gallery-item"><img src="${g.url}" alt="${g.caption||''}" onerror="this.style.display='none'"><div class="gal-actions"><button class="btn btn-red btn-xs" onclick="delGallery('${g.id}')">🗑️</button></div><div class="gal-caption">${g.caption||g.category||''}</div></div>`).join('');
+  }catch{}
+}
+async function uploadGallery(e){
+  const files=[...e.target.files];if(!files.length)return;
+  const fd=new FormData();files.forEach(f=>fd.append('images',f));fd.append('caption',document.getElementById('gal-caption').value);fd.append('category',document.getElementById('gal-category').value);
+  const prog=document.getElementById('galProg'),fill=document.getElementById('galFill'),text=document.getElementById('galText');
+  prog.classList.remove('hidden');fill.style.width='40%';text.textContent=`Uploading ${files.length} image(s)…`;
+  try{const r=await fetch('/api/admin/gallery/upload',{method:'POST',credentials:'include',body:fd});const d=await r.json();fill.style.width='100%';if(d.success){text.textContent=`✅ ${d.count} uploaded!`;toast(`${d.count} images uploaded!`);setTimeout(()=>{document.getElementById('galleryUploadModal').classList.add('hidden');prog.classList.add('hidden');loadGallery();},1500);}else{text.textContent='❌ '+d.error;toast(d.error,'error');}}catch{text.textContent='❌ Failed';toast('Upload failed','error');}
+}
+async function delGallery(id){if(!confirm('Delete image?'))return;await fetch(`/api/admin/gallery/${id}`,{method:'DELETE',credentials:'include'});toast('Deleted.');loadGallery();}
+
+// ── Admissions ────────────────────────────────────────────────────────
+async function loadAdmissions(){
+  const search=document.getElementById('adm-search').value,status=document.getElementById('adm-filter').value;
+  let url='/api/admin/admissions?';if(search)url+=`search=${encodeURIComponent(search)}&`;if(status)url+=`status=${status}&`;
+  try{
+    const a=await(await fetch(url,{credentials:'include'})).json();
+    const tbody=document.getElementById('admissionsBody');
+    if(!a.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">No admissions found.</td></tr>';return;}
+    tbody.innerHTML=a.map(x=>`<tr>
+      <td><strong>${x.name}</strong></td><td>Class ${x.class}</td>
+      <td><a href="tel:${x.mobile}" style="color:var(--deep-blue);text-decoration:none">${x.mobile}</a></td>
+      <td>${x.village||'—'}</td><td style="font-size:13px">${x.school||'—'}</td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDate(x.submittedAt)}</td>
+      <td><select onchange="updateAdmStatus('${x.id}',this.value)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">
+        <option value="new" ${x.status==='new'?'selected':''}>🔵 New</option>
+        <option value="contacted" ${x.status==='contacted'?'selected':''}>🟡 Contacted</option>
+        <option value="enrolled" ${x.status==='enrolled'?'selected':''}>🟢 Enrolled</option>
+        <option value="rejected" ${x.status==='rejected'?'selected':''}>🔴 Rejected</option>
+      </select></td>
+      <td><div class="td-actions">
+        <button class="btn btn-ghost btn-xs" onclick='showAdmDetail(${JSON.stringify(x)})'>👁️</button>
+        <button class="btn btn-red btn-xs" onclick="delAdm('${x.id}')">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  }catch{}
+}
+async function updateAdmStatus(id,status){await fetch(`/api/admin/admissions/${id}`,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});toast(`Status → ${status}`);}
+function showAdmDetail(a){
+  document.getElementById('admModalBody').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div><label style="font-size:12px;color:var(--muted)">NAME</label><div style="font-size:16px;font-weight:700">${a.name}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">CLASS</label><div style="font-size:16px;font-weight:700">Class ${a.class}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">MOBILE</label><div style="font-size:16px"><a href="tel:${a.mobile}">${a.mobile}</a></div></div>
+    <div><label style="font-size:12px;color:var(--muted)">VILLAGE</label><div style="font-size:16px">${a.village||'—'}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">SCHOOL</label><div style="font-size:16px">${a.school||'—'}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">PARENT NAME</label><div style="font-size:16px">${a.parentName||'—'}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">PARENT MOBILE</label><div style="font-size:16px">${a.parentMobile||'—'}</div></div>
+    <div><label style="font-size:12px;color:var(--muted)">SUBMITTED</label><div style="font-size:16px">${fmtDate(a.submittedAt)}</div></div>
+  </div>
+  ${a.message?`<div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:8px"><label style="font-size:12px;color:var(--muted)">MESSAGE</label><div>${a.message}</div></div>`:''}
+  <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+    <a class="btn btn-green btn-sm" href="https://wa.me/91${a.mobile}" target="_blank">💬 WhatsApp</a>
+    <a class="btn btn-blue btn-sm" href="tel:${a.mobile}">📞 Call</a>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('admModal').classList.add('hidden')">Close</button>
+  </div>`;
+  document.getElementById('admModal').classList.remove('hidden');
+}
+async function delAdm(id){if(!confirm('Delete this admission?'))return;await fetch(`/api/admin/admissions/${id}`,{method:'DELETE',credentials:'include'});toast('Deleted.');loadAdmissions();}
+
+// ── Notices ─────────────────────────────────────────────────────────
+async function loadNotices(){
+  try{
+    const n=await(await fetch('/api/admin/notices',{credentials:'include'})).json();
+    const el=document.getElementById('noticesList');
+    if(!n.length){el.innerHTML='<div style="color:var(--muted);padding:20px">No notices yet.</div>';return;}
+    el.innerHTML=n.map(x=>`<div class="notice-card"><div class="notice-type nt-${x.type}"></div><div class="notice-body"><h4>${x.title}</h4>${x.body?`<p>${x.body}</p>`:''}<div class="notice-meta">${fmtDate(x.createdAt)}${x.expiresAt?' · Expires: '+fmtDate(x.expiresAt):''}</div></div><div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn btn-ghost btn-xs" onclick='editNotice(${JSON.stringify(x)})'>✏️</button>
+      <button class="btn ${x.active?'btn-red':'btn-green'} btn-xs" onclick="toggleNotice('${x.id}',${!!x.active})">${x.active?'Deactivate':'Activate'}</button>
+      <button class="btn btn-red btn-xs" onclick="delNotice('${x.id}')">🗑️</button>
+    </div></div>`).join('');
+  }catch{}
+}
+function openNoticeModal(){document.getElementById('nt-title').value='';document.getElementById('nt-body').value='';document.getElementById('nt-expires').value='';document.getElementById('nt-id').value='';document.getElementById('noticeMTitle').textContent='Add Notice';document.getElementById('noticeModal').classList.remove('hidden');}
+function editNotice(n){document.getElementById('nt-title').value=n.title;document.getElementById('nt-body').value=n.body||'';document.getElementById('nt-type').value=n.type||'info';document.getElementById('nt-expires').value=n.expiresAt?n.expiresAt.slice(0,10):'';document.getElementById('nt-id').value=n.id;document.getElementById('noticeMTitle').textContent='Edit Notice';document.getElementById('noticeModal').classList.remove('hidden');}
+async function saveNotice(){const id=document.getElementById('nt-id').value,body={title:document.getElementById('nt-title').value.trim(),body:document.getElementById('nt-body').value.trim(),type:document.getElementById('nt-type').value,expiresAt:document.getElementById('nt-expires').value||null};if(!body.title){toast('Title required','error');return;}const url=id?`/api/admin/notices/${id}`:'/api/admin/notices',method=id?'PATCH':'POST';const r=await fetch(url,{method,credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.success||d.notice){toast(id?'Updated!':'Notice added!');document.getElementById('noticeModal').classList.add('hidden');loadNotices();}else toast(d.error,'error');}
+async function toggleNotice(id,active){await fetch(`/api/admin/notices/${id}`,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:!active})});toast(`Notice ${!active?'activated':'deactivated'}.`);loadNotices();}
+async function delNotice(id){if(!confirm('Delete notice?'))return;await fetch(`/api/admin/notices/${id}`,{method:'DELETE',credentials:'include'});toast('Deleted.');loadNotices();}
+
+// ── Testimonials ──────────────────────────────────────────────────────
+async function loadTestimonials(){
+  try{
+    const t=await(await fetch('/api/admin/testimonials',{credentials:'include'})).json();
+    const tbody=document.getElementById('testimonialsBody');
+    if(!t.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No testimonials.</td></tr>';return;}
+    tbody.innerHTML=t.map(x=>`<tr>
+      <td><strong>${x.studentName}</strong></td><td>${x.class?'Class '+x.class:'—'}</td>
+      <td>${'⭐'.repeat(x.rating||5)}</td>
+      <td style="font-size:13px;max-width:280px">${x.text}</td>
+      <td><span class="badge ${x.visible?'badge-green':'badge-red'}">${x.visible?'Visible':'Hidden'}</span></td>
+      <td><div class="td-actions">
+        <button class="btn btn-ghost btn-xs" onclick='editTestimonial(${JSON.stringify(x)})'>✏️</button>
+        <button class="btn btn-ghost btn-xs" onclick="toggleTm('${x.id}',${!!x.visible})">${x.visible?'Hide':'Show'}</button>
+        <button class="btn btn-red btn-xs" onclick="delTm('${x.id}')">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  }catch{}
+}
+function openTestimonialModal(){document.getElementById('tm-name').value='';document.getElementById('tm-class').value='';document.getElementById('tm-school').value='';document.getElementById('tm-text').value='';document.getElementById('tm-id').value='';document.getElementById('testimonialModal').classList.remove('hidden');}
+function editTestimonial(t){document.getElementById('tm-name').value=t.studentName;document.getElementById('tm-class').value=t.class||'';document.getElementById('tm-school').value=t.school||'';document.getElementById('tm-text').value=t.text;document.getElementById('tm-rating').value=t.rating||5;document.getElementById('tm-id').value=t.id;document.getElementById('testimonialModal').classList.remove('hidden');}
+async function saveTestimonial(){const id=document.getElementById('tm-id').value,body={studentName:document.getElementById('tm-name').value.trim(),class:document.getElementById('tm-class').value,school:document.getElementById('tm-school').value.trim(),text:document.getElementById('tm-text').value.trim(),rating:parseInt(document.getElementById('tm-rating').value)};if(!body.studentName||!body.text){toast('Name & text required','error');return;}const url=id?`/api/admin/testimonials/${id}`:'/api/admin/testimonials',method=id?'PATCH':'POST';const r=await fetch(url,{method,credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.success||d.testimonial){toast(id?'Updated!':'Added!');document.getElementById('testimonialModal').classList.add('hidden');loadTestimonials();}else toast(d.error,'error');}
+async function toggleTm(id,v){await fetch(`/api/admin/testimonials/${id}`,{method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({visible:!v})});toast(`${!v?'Shown':'Hidden'}.`);loadTestimonials();}
+async function delTm(id){if(!confirm('Delete?'))return;await fetch(`/api/admin/testimonials/${id}`,{method:'DELETE',credentials:'include'});toast('Deleted.');loadTestimonials();}
+
+// ── Settings ──────────────────────────────────────────────────────────
+async function loadSettings(){try{const s=await(await fetch('/api/admin/settings',{credentials:'include'})).json();document.getElementById('set-name').value=s.siteName||'';document.getElementById('set-owner').value=s.ownerName||'';document.getElementById('set-phone').value=s.phone||'';document.getElementById('set-email').value=s.email||'';document.getElementById('set-address').value=s.address||'';document.getElementById('set-about').value=s.aboutText||'';}catch{}}
+async function saveSettings(){const body={siteName:document.getElementById('set-name').value.trim(),ownerName:document.getElementById('set-owner').value.trim(),phone:document.getElementById('set-phone').value.trim(),email:document.getElementById('set-email').value.trim(),address:document.getElementById('set-address').value.trim(),aboutText:document.getElementById('set-about').value.trim()};const r=await fetch('/api/admin/settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.success)toast('Settings saved!');else toast(d.error,'error');}
+async function changePassword(){const cur=document.getElementById('set-cur-pass').value,nw=document.getElementById('set-new-pass').value;const r=await fetch('/api/admin/change-password',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({currentPassword:cur,newPassword:nw})});const d=await r.json();if(d.success){toast(d.message);document.getElementById('set-cur-pass').value='';document.getElementById('set-new-pass').value='';}else toast(d.error,'error');}
+
+checkAuth();
+</script>
+</body>
+</html>
