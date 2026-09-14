@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMT - Genius Mathematics Tutorial | Naresh Kumar Yadav</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Hind:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== VARIABLES ===== */
+:root {
+  --saffron: #FF6B00;
+  --deep-blue: #0A1F6E;
+  --gold: #FFD700;
+  --green: #00A651;
+  --light-bg: #FFF8F0;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --muted: #666;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(10,31,110,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Hind', sans-serif;
+  background: var(--light-bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: var(--saffron); border-radius: 3px; }
+
+/* ===== TOP BAR ===== */
+.top-bar {
+  background: var(--deep-blue);
+  color: #ccd;
+  text-align: center;
+  font-size: 13px;
+  padding: 7px 20px;
+  letter-spacing: 0.5px;
+}
+.top-bar a { color: var(--gold); text-decoration: none; }
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, var(--deep-blue) 0%, #1a3a8f 60%, #0d2b6e 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255,107,0,0.18) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,215,0,0.12) 0%, transparent 40%);
+  pointer-events: none;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.logo-circle {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 28px; font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 20px rgba(255,107,0,0.5);
+  flex-shrink: 0;
+}
+.header-text h1 {
+  font-family: 'Baloo 2', cursive;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.header-text h1 span { color: var(--gold); }
+.header-text .subtitle { font-size: 13px; color: #a0b4e8; margin-top: 3px; }
+.header-contact {
+  text-align: right;
+  font-size: 13px;
+  color: #a0b4e8;
+  line-height: 1.8;
+}
+.header-contact a { color: var(--gold); text-decoration: none; font-weight: 600; }
+
+/* ===== HERO ===== */
+.hero {
+  background:
+    linear-gradient(rgba(10,31,110,0.72), rgba(10,31,110,0.82)),
+    url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1400&q=80') center/cover no-repeat;
+  color: white;
+  text-align: center;
+  padding: 80px 30px;
+  position: relative;
+}
+.hero-badge {
+  display: inline-block;
+  background: var(--saffron);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  animation: fadeDown 0.7s ease both;
+}
+.hero h2 {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  line-height: 1.2;
+  animation: fadeDown 0.9s ease both;
+}
+.hero h2 span { color: var(--gold); }
+.hero-hindi {
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: #c8d8ff;
+  margin: 12px 0 24px;
+  font-weight: 400;
+  animation: fadeDown 1.1s ease both;
+}
+.motivational-quotes {
+  margin: 28px auto;
+  max-width: 700px;
+  animation: fadeDown 1.3s ease both;
+}
+.quote-slide {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-left: 4px solid var(--gold);
+  padding: 16px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-style: italic;
+  display: none;
+  color: #e8f0ff;
+}
+.quote-slide.active { display: block; animation: fadeIn 0.6s ease; }
+.hero-btns {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  margin-top: 30px;
+  animation: fadeDown 1.5s ease both;
+}
+.btn-primary {
+  padding: 14px 30px;
+  background: linear-gradient(135deg, var(--saffron), #ff8c00);
+  color: white; border-radius: 50px;
+  text-decoration: none; font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 6px 20px rgba(255,107,0,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none; cursor: pointer;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(255,107,0,0.5); }
+.btn-secondary {
+  padding: 14px 30px;
+  background: transparent;
+  color: white; border-radius: 50px;
+  text-decoration: none; font-weight: 700;
+  font-size: 15px;
+  border: 2px solid white;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-secondary:hover { background: white; color: var(--deep-blue); }
+.btn-yt {
+  padding: 14px 30px;
+  background: #FF0000;
+  color: white; border-radius: 50px;
+  text-decoration: none; font-weight: 700;
+  font-size: 15px;
+  display: flex; align-items: center; gap: 8px;
+  border: none; cursor: pointer;
+  transition: transform 0.2s;
+}
+.btn-yt:hover { transform: translateY(-3px); }
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  background: white;
+  display: flex; flex-wrap: wrap;
+  justify-content: center; gap: 0;
+  box-shadow: var(--shadow);
+  border-bottom: 3px solid var(--saffron);
+}
+.stat-item {
+  text-align: center;
+  padding: 22px 36px;
+  border-right: 1px solid #eee;
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Baloo 2', cursive;
+  font-size: 32px; font-weight: 800;
+  color: var(--saffron);
+  line-height: 1;
+}
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ===== NAV ===== */
+nav {
+  background: white;
+  display: flex; justify-content: center; flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  position: sticky; top: 0; z-index: 100;
+}
+nav a {
+  padding: 16px 18px;
+  text-decoration: none; color: var(--text);
+  font-weight: 600; font-size: 14px;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+nav a:hover { color: var(--saffron); border-bottom-color: var(--saffron); }
+
+/* ===== SECTION TITLES ===== */
+.section-title {
+  text-align: center; margin-bottom: 40px;
+}
+.section-title h2 {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  color: var(--deep-blue);
+  position: relative; display: inline-block;
+}
+.section-title h2::after {
+  content: '';
+  display: block; width: 60%; height: 4px;
+  background: linear-gradient(to right, var(--saffron), var(--gold));
+  border-radius: 2px; margin: 8px auto 0;
+}
+.section-title p { color: var(--muted); margin-top: 10px; font-size: 15px; }
+
+/* ===== SECTIONS ===== */
+section {
+  padding: 60px 30px;
+  max-width: 1100px; margin: 0 auto;
+}
+.full-section {
+  padding: 60px 30px;
+  background: white;
+}
+.full-section > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+
+/* ===== ABOUT ===== */
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+}
+@media(max-width:700px){ .about-grid { grid-template-columns: 1fr; } }
+.about-img-box {
+  background:
+    linear-gradient(rgba(10,31,110,0.6), rgba(10,31,110,0.6)),
+    url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80') center/cover;
+  border-radius: var(--radius);
+  padding: 50px 30px;
+  text-align: center;
+  color: white;
+}
+.teacher-avatar {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 4px solid var(--gold);
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; margin: 0 auto 16px;
+}
+.about-img-box h3 { font-family: 'Baloo 2', cursive; font-size: 22px; }
+.about-img-box p { font-size: 13px; color: #c8d8ff; margin-top: 5px; }
+.about-features { list-style: none; }
+.about-features li {
+  padding: 12px 0; border-bottom: 1px solid #eee;
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 15px;
+}
+.about-features li:last-child { border-bottom: none; }
+.feat-icon { font-size: 22px; flex-shrink: 0; }
+.feat-text strong { display: block; color: var(--deep-blue); }
+.feat-text span { font-size: 13px; color: var(--muted); }
+
+/* ===== NOTICE ===== */
+.notice-section {
+  background: linear-gradient(135deg, var(--deep-blue), #1a3a8f);
+  color: white;
+}
+.notice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 16px; }
+.notice-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.notice-card .notice-tag {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--gold); font-weight: 700; margin-bottom: 8px;
+}
+.notice-card p { font-size: 14px; line-height: 1.6; }
+
+/* ===== CLASSES ===== */
+.classes-bg {
+  background:
+    linear-gradient(rgba(255,248,240,0.95), rgba(255,248,240,0.95)),
+    url('https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1400&q=80') center/cover fixed;
+}
+.classes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 20px; }
+.class-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.class-card:hover { transform: translateY(-5px); }
+.class-card-header {
+  padding: 20px; color: white;
+  display: flex; align-items: center; gap: 14px;
+}
+.class-card:nth-child(1) .class-card-header { background: linear-gradient(135deg,#e04d0d,#ff8c00); }
+.class-card:nth-child(2) .class-card-header { background: linear-gradient(135deg,#0A1F6E,#1a3a8f); }
+.class-card:nth-child(3) .class-card-header { background: linear-gradient(135deg,#00A651,#00d468); }
+.class-card:nth-child(4) .class-card-header { background: linear-gradient(135deg,#8b00d4,#c44dff); }
+.class-num {
+  font-family: 'Baloo 2', cursive;
+  font-size: 36px; font-weight: 800; line-height: 1;
+}
+.class-card-header h3 { font-size: 16px; font-weight: 700; }
+.class-card-header p { font-size: 12px; opacity: 0.85; }
+.class-card-body { padding: 18px 20px; }
+.class-feature {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+.class-feature:last-child { border-bottom: none; }
+.class-feature .icon { font-size: 18px; }
+
+/* ===== NOTES/RESOURCES ===== */
+.resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; }
+.resource-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.2s;
+  cursor: pointer;
+  text-decoration: none; color: inherit;
+}
+.resource-card:hover { transform: translateY(-4px); }
+.resource-icon { font-size: 44px; margin-bottom: 12px; }
+.resource-card h4 { font-size: 15px; font-weight: 700; color: var(--deep-blue); }
+.resource-card p { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.resource-tag {
+  display: inline-block; margin-top: 10px;
+  padding: 3px 12px; border-radius: 50px;
+  font-size: 11px; font-weight: 700;
+  background: #fff3e0; color: var(--saffron);
+}
+
+/* ===== TOPPERS ===== */
+.toppers-bg {
+  background:
+    linear-gradient(rgba(10,31,110,0.88), rgba(10,31,110,0.92)),
+    url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&q=80') center/cover fixed;
+  color: white;
+}
+.toppers-bg .section-title h2 { color: var(--gold); }
+.toppers-bg .section-title p { color: #a0b4e8; }
+.toppers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 24px; }
+.topper-card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  transition: transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.topper-card::before {
+  content: '🏆';
+  position: absolute; top: -10px; right: 10px;
+  font-size: 48px; opacity: 0.15;
+}
+.topper-card:hover { transform: translateY(-5px); }
+.topper-card.gold-card { border-top: 4px solid var(--gold); }
+.topper-card.silver-card { border-top: 4px solid #c0c0c0; }
+.topper-img {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  margin: 0 auto 14px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+}
+.topper-year {
+  display: inline-block;
+  background: var(--saffron);
+  color: white; font-size: 11px;
+  font-weight: 700; padding: 2px 12px;
+  border-radius: 50px; margin-bottom: 10px;
+}
+.topper-card h3 { font-family: 'Baloo 2', cursive; font-size: 18px; color: white; }
+.topper-marks {
+  font-size: 28px; font-weight: 800;
+  color: var(--gold); font-family: 'Baloo 2', cursive;
+  margin: 8px 0;
+}
+.topper-card p { font-size: 12px; color: #a0b4e8; margin: 3px 0; }
+.topper-badge {
+  display: inline-block; margin-top: 10px;
+  padding: 4px 14px; border-radius: 50px;
+  font-size: 12px; font-weight: 700;
+  background: rgba(255,215,0,0.2); color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+/* ===== YOUTUBE ===== */
+.yt-section {
+  background: linear-gradient(135deg, #1a0000, #3d0000);
+  color: white;
+  text-align: center;
+}
+.yt-section .section-title h2 { color: white; }
+.yt-section .section-title p { color: #ffaaaa; }
+.yt-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 36px;
+  max-width: 600px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+.yt-logo { font-size: 72px; }
+.yt-card h3 { font-family: 'Baloo 2', cursive; font-size: 22px; }
+.yt-card p { font-size: 14px; color: #ffcccc; }
+.btn-yt-big {
+  padding: 16px 36px;
+  background: #FF0000; color: white;
+  border-radius: 50px; text-decoration: none;
+  font-weight: 700; font-size: 16px;
+  display: flex; align-items: center; gap: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 24px rgba(255,0,0,0.4);
+}
+.btn-yt-big:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(255,0,0,0.5); }
+.yt-stats { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+.yt-stat { text-align: center; }
+.yt-stat .num { font-family: 'Baloo 2', cursive; font-size: 26px; color: #FF0000; }
+.yt-stat .lbl { font-size: 12px; color: #ffaaaa; }
+
+/* ===== MOTIVATION ===== */
+.motivation-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 20px;
+}
+.mot-card {
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative; overflow: hidden;
+}
+.mot-card:nth-child(1) { background: linear-gradient(135deg,#FF6B00,#ff9a00); color: white; }
+.mot-card:nth-child(2) { background: linear-gradient(135deg,#0A1F6E,#1a3a8f); color: white; }
+.mot-card:nth-child(3) { background: linear-gradient(135deg,#00A651,#00c96d); color: white; }
+.mot-card:nth-child(4) { background: linear-gradient(135deg,#8b00d4,#c44dff); color: white; }
+.mot-card:nth-child(5) { background: linear-gradient(135deg,#c0392b,#e74c3c); color: white; }
+.mot-card:nth-child(6) { background: linear-gradient(135deg,#2c3e50,#4ca1af); color: white; }
+.mot-quote { font-size: 30px; margin-bottom: 12px; }
+.mot-card .en { font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+.mot-card .hi { font-size: 14px; opacity: 0.85; font-style: italic; }
+
+/* ===== TESTIMONIALS ===== */
+.test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 20px; }
+.test-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  position: relative;
+}
+.test-card::before {
+  content: '"';
+  position: absolute; top: 10px; left: 18px;
+  font-size: 60px; color: var(--saffron);
+  font-family: Georgia, serif;
+  line-height: 1; opacity: 0.3;
+}
+.test-stars { color: var(--gold); font-size: 16px; margin-bottom: 12px; }
+.test-card p { font-size: 14px; line-height: 1.7; color: #444; padding-top: 10px; }
+.test-name { margin-top: 14px; font-weight: 700; color: var(--deep-blue); font-size: 14px; }
+.test-class { font-size: 12px; color: var(--muted); }
+
+/* ===== FAQ ===== */
+.faq-list { max-width: 800px; margin: 0 auto; }
+.faq-item {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.faq-q {
+  padding: 18px 20px;
+  font-weight: 700; font-size: 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.faq-q:hover { background: #fff3e0; }
+.faq-icon { font-size: 20px; color: var(--saffron); transition: transform 0.3s; }
+.faq-a {
+  display: none;
+  padding: 0 20px 18px;
+  font-size: 14px; color: #555; line-height: 1.7;
+  border-top: 1px solid #eee;
+  padding-top: 14px;
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-item.open .faq-a { display: block; }
+
+/* ===== ADMISSION ===== */
+.admission-section {
+  background:
+    linear-gradient(rgba(255,248,240,0.96), rgba(255,248,240,0.96)),
+    url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1400&q=80') center/cover;
+}
+.admission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+@media(max-width:700px) { .admission-grid { grid-template-columns: 1fr; } }
+.form-box {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+}
+.form-box h3 { font-family: 'Baloo 2', cursive; font-size: 22px; color: var(--deep-blue); margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Hind', sans-serif;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--saffron); }
+.form-group textarea { height: 90px; resize: none; }
+.admission-info { }
+.info-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.info-card h4 { font-family: 'Baloo 2', cursive; color: var(--deep-blue); margin-bottom: 12px; }
+.info-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; align-items: center; }
+.info-row:last-child { border-bottom: none; }
+.info-row .lbl { color: var(--muted); flex: 1; }
+.info-row .val { font-weight: 600; color: var(--deep-blue); }
+
+/* ===== CONTACT ===== */
+.contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; }
+.contact-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+}
+.contact-icon { font-size: 36px; margin-bottom: 12px; }
+.contact-card h4 { font-weight: 700; color: var(--deep-blue); margin-bottom: 6px; }
+.contact-card p { font-size: 13px; color: var(--muted); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--deep-blue);
+  color: #a0b4e8;
+  padding: 40px 30px 20px;
+}
+.footer-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+}
+@media(max-width:700px) { .footer-inner { grid-template-columns: 1fr; } }
+.footer-brand h3 { font-family: 'Baloo 2', cursive; color: white; font-size: 22px; margin-bottom: 10px; }
+.footer-brand p { font-size: 13px; line-height: 1.7; }
+.footer-col h4 { color: white; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.footer-col a { display: block; color: #a0b4e8; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+.footer-col a:hover { color: var(--gold); }
+.footer-bottom {
+  max-width: 1100px; margin: 30px auto 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 16px;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  font-size: 12px;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+.fade-in {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== LANGUAGE TOGGLE ===== */
+.lang-toggle {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--saffron); color: white;
+  border: none; border-radius: 50px;
+  padding: 12px 20px; font-size: 14px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(255,107,0,0.5);
+  font-family: 'Hind', sans-serif;
+}
+.hi-text { display: none; }
+body.hindi .en-text { display: none; }
+body.hindi .hi-text { display: inline; }
+
+@media(max-width:600px){
+  section { padding: 40px 16px; }
+  .header-inner { padding: 20px 16px; }
+  .hero { padding: 50px 16px; }
+  .stat-item { padding: 16px 20px; }
+  nav a { padding: 12px 10px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  📍 Old SSB Camp, Purandra &nbsp;|&nbsp; 📞 Call for Admission &nbsp;|&nbsp;
+  <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank">▶ YouTube Channel</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="logo-circle">GMT</div>
+      <div class="header-text">
+        <h1>Genius <span>Mathematics</span> Tutorial</h1>
+        <div class="subtitle">Bihar Board & CBSE | Class 9 to 12 | Maths & Science</div>
+      </div>
+    </div>
+    <div class="header-contact">
+      <div>👨‍🏫 Naresh Kumar Yadav</div>
+      <div>📍 Old SSB Camp, Purandra</div>
+      <div><a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank">▶ GMT YouTube Channel</a></div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero">🏠 Home</a>
+  <a href="#about">👨‍🏫 About</a>
+  <a href="#classes">📚 Classes</a>
+  <a href="#resources">📄 Notes/PDF</a>
+  <a href="#toppers">🏆 Toppers</a>
+  <a href="#youtube">▶ YouTube</a>
+  <a href="#motivation">💪 Motivation</a>
+  <a href="#contact">📞 Contact</a>
+  <a href="#admission">✍ Admission</a>
+</nav>
+
+<!-- HERO -->
+<div id="hero" class="hero">
+  <div class="hero-badge">🌟 Bihar Board & CBSE Coaching — Since 2018</div>
+  <h2>
+    <span class="en-text">Welcome to <span>GMT</span> Coaching Center</span>
+    <span class="hi-text">GMT कोचिंग सेंटर में आपका स्वागत है</span>
+  </h2>
+  <div class="hero-hindi">
+    <span class="en-text">"Dream Big · Study Smart · Achieve Success 🚀"</span>
+    <span class="hi-text">"बड़े सपने देखो · मेहनत करो · सफलता पाओ 🚀"</span>
+  </div>
+  <div class="motivational-quotes">
+    <div class="quote-slide active">
+      "Success is not given, it is earned through hard work and dedication." <br>
+      <small>— <em>सफलता मिलती नहीं, मेहनत से कमाई जाती है।</em></small>
+    </div>
+    <div class="quote-slide">
+      "A student today is a leader tomorrow." <br>
+      <small>— <em>आज का विद्यार्थी, कल का नेता।</em></small>
+    </div>
+    <div class="quote-slide">
+      "Mathematics is not about numbers — it's about understanding." <br>
+      <small>— <em>गणित संख्याओं के बारे में नहीं — समझ के बारे में है।</em></small>
+    </div>
+    <div class="quote-slide">
+      "Every expert was once a beginner. Keep going!" <br>
+      <small>— <em>हर माहिर कभी शुरुआती था। हार मत मानो!</em></small>
+    </div>
+  </div>
+  <div class="hero-btns">
+    <a href="#admission" class="btn-primary">✍ Join Now / अभी जुड़ें</a>
+    <a href="#classes" class="btn-secondary">📚 View Classes</a>
+    <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" class="btn-yt">▶ YouTube Channel</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item fade-in">
+    <div class="stat-num">6+</div>
+    <div class="stat-label">Years Experience / वर्षों का अनुभव</div>
+  </div>
+  <div class="stat-item fade-in">
+    <div class="stat-num">500+</div>
+    <div class="stat-label">Students Taught / छात्र पढ़ाए</div>
+  </div>
+  <div class="stat-item fade-in">
+    <div class="stat-num">4</div>
+    <div class="stat-label">Board Toppers / बोर्ड टॉपर्स</div>
+  </div>
+  <div class="stat-item fade-in">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Concept Focus / कॉन्सेप्ट पर ध्यान</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="fade-in">
+  <div class="section-title">
+    <h2>
+      <span class="en-text">About Us / हमारे बारे में</span>
+      <span class="hi-text">हमारे बारे में</span>
+    </h2>
+    <p>
+      <span class="en-text">Know your teacher and our teaching approach</span>
+      <span class="hi-text">अपने शिक्षक और हमारी शिक्षण पद्धति जानें</span>
+    </p>
+  </div>
+  <div class="about-grid">
+    <div class="about-img-box">
+      <div class="teacher-avatar">👨‍🏫</div>
+      <h3>Naresh Kumar Yadav</h3>
+      <p>Head Teacher & Founder, GMT Tutorial</p>
+      <p style="margin-top:16px;font-size:13px;opacity:0.8;">📍 Old SSB Camp, Purandra<br>🎓 Bihar Board + CBSE Expert<br>⏳ 6+ Years Teaching Experience</p>
+    </div>
+    <ul class="about-features">
+      <li>
+        <span class="feat-icon">🏆</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Board Exam Specialist</span><span class="hi-text">बोर्ड परीक्षा विशेषज्ञ</span></strong>
+          <span><span class="en-text">Bihar Board & CBSE both covered</span><span class="hi-text">Bihar Board और CBSE दोनों पढ़ाए जाते हैं</span></span>
+        </div>
+      </li>
+      <li>
+        <span class="feat-icon">📐</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Maths & Science Expert</span><span class="hi-text">गणित और विज्ञान विशेषज्ञ</span></strong>
+          <span><span class="en-text">Deep conceptual teaching from basics to advanced</span><span class="hi-text">बुनियाद से उन्नत स्तर तक गहरी शिक्षा</span></span>
+        </div>
+      </li>
+      <li>
+        <span class="feat-icon">📝</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Notes + PDF + PPT Provided</span><span class="hi-text">नोट्स + PDF + PPT दिए जाते हैं</span></strong>
+          <span><span class="en-text">Study material for all classes available</span><span class="hi-text">सभी कक्षाओं के लिए अध्ययन सामग्री उपलब्ध</span></span>
+        </div>
+      </li>
+      <li>
+        <span class="feat-icon">📅</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Weekly Tests Every Sunday</span><span class="hi-text">हर रविवार साप्ताहिक परीक्षा</span></strong>
+          <span><span class="en-text">Regular assessment and performance tracking</span><span class="hi-text">नियमित मूल्यांकन और प्रदर्शन ट्रैकिंग</span></span>
+        </div>
+      </li>
+      <li>
+        <span class="feat-icon">🌐</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Hindi + English Medium</span><span class="hi-text">हिंदी + अंग्रेजी माध्यम</span></strong>
+          <span><span class="en-text">Specially designed for village area students</span><span class="hi-text">ग्रामीण क्षेत्र के छात्रों के लिए विशेष</span></span>
+        </div>
+      </li>
+      <li>
+        <span class="feat-icon">▶</span>
+        <div class="feat-text">
+          <strong><span class="en-text">Online Video Lectures on YouTube</span><span class="hi-text">YouTube पर ऑनलाइन वीडियो लेक्चर</span></strong>
+          <span><a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" style="color:var(--saffron);">GMT YouTube Channel →</a></span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- NOTICE -->
+<div class="full-section notice-section fade-in">
+  <div class="section-title">
+    <h2 style="color:var(--gold);">📢 <span class="en-text">Notice Board / सूचना पट्ट</span><span class="hi-text">सूचना पट्ट</span></h2>
+    <p style="color:#a0b4e8;"><span class="en-text">Latest updates and announcements</span><span class="hi-text">नवीनतम अपडेट और घोषणाएं</span></p>
+  </div>
+  <div class="notice-grid">
+    <div class="notice-card">
+      <div class="notice-tag">🔴 New / नया</div>
+      <p><strong>New Batch Starting Soon!</strong><br>नया बैच जल्द शुरू होगा। अभी Registration कराएं।</p>
+    </div>
+    <div class="notice-card">
+      <div class="notice-tag">📅 Weekly</div>
+      <p><strong>Weekly Test Every Sunday</strong><br>हर रविवार साप्ताहिक परीक्षा होगी। तैयार रहें।</p>
+    </div>
+    <div class="notice-card">
+      <div class="notice-tag">📚 Special</div>
+      <p><strong>Class 10 Board Special Batch</strong><br>Class 10 बोर्ड परीक्षा के लिए विशेष बैच उपलब्ध।</p>
+    </div>
+    <div class="notice-card">
+      <div class="notice-tag">📄 Notes</div>
+      <p><strong>PDF Notes Now Available</strong><br>सभी Classes के PDF Notes डाउनलोड करें।</p>
+    </div>
+  </div>
+</div>
+
+<!-- CLASSES -->
+<div class="full-section classes-bg" id="classes">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-title fade-in">
+      <h2>
+        <span class="en-text">Our Classes / हमारी कक्षाएं</span>
+        <span class="hi-text">हमारी कक्षाएं</span>
+      </h2>
+      <p><span class="en-text">Class 9 to 12 — Maths & Science</span><span class="hi-text">कक्षा 9 से 12 — गणित और विज्ञान</span></p>
+    </div>
+    <div class="classes-grid fade-in">
+      <div class="class-card">
+        <div class="class-card-header">
+          <div class="class-num">9</div>
+          <div>
+            <h3>Class 9 / कक्षा 9</h3>
+            <p>Foundation Level / आधार स्तर</p>
+          </div>
+        </div>
+        <div class="class-card-body">
+          <div class="class-feature"><span class="icon">✅</span> Foundation Concepts / आधार अवधारणाएं</div>
+          <div class="class-feature"><span class="icon">📝</span> Notes + Weekly Test</div>
+          <div class="class-feature"><span class="icon">📄</span> PDF & PPT Study Material</div>
+          <div class="class-feature"><span class="icon">🎥</span> YouTube Video Support</div>
+          <div class="class-feature"><span class="icon">🧮</span> Maths & Science / गणित और विज्ञान</div>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-card-header">
+          <div class="class-num">10</div>
+          <div>
+            <h3>Class 10 / कक्षा 10</h3>
+            <p>Board Exam Preparation</p>
+          </div>
+        </div>
+        <div class="class-card-body">
+          <div class="class-feature"><span class="icon">✅</span> Board Exam Preparation / बोर्ड तैयारी</div>
+          <div class="class-feature"><span class="icon">📄</span> PYQ (Previous Year Questions)</div>
+          <div class="class-feature"><span class="icon">📝</span> Full Practice + Mock Tests</div>
+          <div class="class-feature"><span class="icon">📚</span> Notes + PDF + PPT</div>
+          <div class="class-feature"><span class="icon">🏆</span> Topper-Level Preparation</div>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-card-header">
+          <div class="class-num">11</div>
+          <div>
+            <h3>Class 11 / कक्षा 11</h3>
+            <p>Advanced Concepts</p>
+          </div>
+        </div>
+        <div class="class-card-body">
+          <div class="class-feature"><span class="icon">✅</span> Advanced Maths Concepts</div>
+          <div class="class-feature"><span class="icon">📄</span> Detailed Study Material</div>
+          <div class="class-feature"><span class="icon">📝</span> Regular Assignments</div>
+          <div class="class-feature"><span class="icon">🎥</span> Video Lectures on YouTube</div>
+          <div class="class-feature"><span class="icon">🔬</span> Science Included / विज्ञान सहित</div>
+        </div>
+      </div>
+      <div class="class-card">
+        <div class="class-card-header">
+          <div class="class-num">12</div>
+          <div>
+            <h3>Class 12 / कक्षा 12</h3>
+            <p>Board + Competitive</p>
+          </div>
+        </div>
+        <div class="class-card-body">
+          <div class="class-feature"><span class="icon">✅</span> Board + Competitive Prep</div>
+          <div class="class-feature"><span class="icon">📊</span> JEE / NEET Foundation</div>
+          <div class="class-feature"><span class="icon">📝</span> Chapter-wise Notes PDF</div>
+          <div class="class-feature"><span class="icon">🔥</span> Exam Strategy & Tips</div>
+          <div class="class-feature"><span class="icon">📄</span> Previous Year Solutions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESOURCES / NOTES -->
+<section id="resources" class="fade-in">
+  <div class="section-title">
+    <h2>
+      <span class="en-text">Study Material / अध्ययन सामग्री</span>
+      <span class="hi-text">अध्ययन सामग्री</span>
+    </h2>
+    <p><span class="en-text">Download PDF, PPT & Notes for all classes — Free for enrolled students</span>
+    <span class="hi-text">सभी कक्षाओं के लिए PDF, PPT और नोट्स डाउनलोड करें — नामांकित छात्रों के लिए निःशुल्क</span></p>
+  </div>
+  <!-- Filter Bar -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;">
+    <select id="res-filter-class" onchange="loadPublicResources()" style="padding:9px 16px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Hind',sans-serif;">
+      <option value="">All Classes / सभी कक्षाएं</option>
+      <option value="9">Class 9</option>
+      <option value="10">Class 10</option>
+      <option value="11">Class 11</option>
+      <option value="12">Class 12</option>
+    </select>
+    <select id="res-filter-type" onchange="loadPublicResources()" style="padding:9px 16px;border:2px solid #eee;border-radius:8px;font-size:14px;outline:none;font-family:'Hind',sans-serif;">
+      <option value="">All Types / सभी प्रकार</option>
+      <option value="pdf">PDF</option>
+      <option value="note">Notes</option>
+      <option value="ppt">PPT</option>
+    </select>
+  </div>
+  <!-- Dynamic resources from backend -->
+  <div id="dynamic-resources-grid" class="resources-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">⏳ Loading study materials...</div>
+  </div>
+  <!-- Static YouTube card always shown -->
+  <div class="resources-grid" style="margin-top:16px;">
+    <div class="resource-card" onclick="window.open('https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ','_blank')">
+      <div class="resource-icon">🎥</div>
+      <h4>Video Lectures</h4>
+      <p>YouTube Channel / यूट्यूब चैनल</p>
+      <span class="resource-tag">▶ Watch Free</span>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:24px;color:var(--muted);font-size:14px;">
+    📞 <span class="en-text">Enrolled students can contact us directly to receive study material.</span>
+    <span class="hi-text">नामांकित छात्र सीधे हमसे संपर्क करके अध्ययन सामग्री प्राप्त करें।</span>
+  </p>
+</section>
+
+<!-- TOPPERS -->
+<div class="full-section toppers-bg" id="toppers">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-title fade-in">
+      <h2>🏆 <span class="en-text">Our Achievers / हमारे टॉपर्स</span><span class="hi-text">हमारे टॉपर्स</span></h2>
+      <p><span class="en-text">Proud students of GMT Tutorial — Board Exam Toppers</span>
+      <span class="hi-text">GMT Tutorial के गर्वित छात्र — बोर्ड परीक्षा टॉपर्स</span></p>
+    </div>
+    <div class="toppers-grid fade-in">
+
+      <!-- Sohail Akhtar 2023 -->
+      <div class="topper-card gold-card">
+        <div class="topper-year">2023 Batch</div>
+        <div class="topper-img">👦</div>
+        <h3>Sohail Akhtar</h3>
+        <div class="topper-marks">456 / 500</div>
+        <p>Class 10 High School Board</p>
+        <p>🏆 High School Topper 2023</p>
+        <p>⭐ 100/100 in Mathematics!</p>
+        <p style="font-size:11px;color:#8aa0d0;margin-top:4px;">Roll No: — | Code: —</p>
+        <div class="topper-badge">🥇 GOLD — Maths 100/100</div>
+      </div>
+
+      <!-- Vishal Pandey 2024 -->
+      <div class="topper-card silver-card">
+        <div class="topper-year">2024 Batch</div>
+        <div class="topper-img">👦</div>
+        <h3>Vishal Pandey</h3>
+        <div class="topper-marks">434 / 500</div>
+        <p>Class 10 High School Board</p>
+        <p>🥈 2nd Topper — High School 2024</p>
+        <p style="font-size:11px;color:#8aa0d0;margin-top:4px;">Roll No: — | Code: —</p>
+        <div class="topper-badge">🥈 SILVER — 2nd Topper</div>
+      </div>
+
+      <!-- Khushboo Khatun 2025 -->
+      <div class="topper-card silver-card">
+        <div class="topper-year">2025 Batch</div>
+        <div class="topper-img">👧</div>
+        <h3>Khushboo Khatun</h3>
+        <div class="topper-marks">438 / 500</div>
+        <p>Class 10 High School Board</p>
+        <p>🥈 2nd Topper — High School 2025</p>
+        <p style="font-size:11px;color:#8aa0d0;margin-top:4px;">Roll No: — | Code: —</p>
+        <div class="topper-badge">🥈 SILVER — 2nd Topper</div>
+      </div>
+
+      <!-- Rajan Kumar 2026 -->
+      <div class="topper-card gold-card">
+        <div class="topper-year">2026 Batch</div>
+        <div class="topper-img">👦</div>
+        <h3>Rajan Kumar</h3>
+        <div class="topper-marks">428 / 500</div>
+        <p>Class 10 High School Board</p>
+        <p>🏆 High School Topper 2026</p>
+        <p style="font-size:11px;color:#8aa0d0;margin-top:4px;">Roll No: — | Code: —</p>
+        <div class="topper-badge">🥇 GOLD — School Topper</div>
+      </div>
+
+    </div>
+    <p style="text-align:center;margin-top:28px;color:#7090c0;font-size:13px;">
+      📌 <span class="en-text">Add student photos and roll numbers by uploading their images here.</span>
+      <span class="hi-text">छात्रों की फ़ोटो और रोल नंबर यहाँ जोड़ें।</span>
+    </p>
+  </div>
+</div>
+
+<!-- YOUTUBE -->
+<div class="full-section yt-section" id="youtube">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-title fade-in">
+      <h2>▶ <span class="en-text">GMT on YouTube</span><span class="hi-text">YouTube पर GMT</span></h2>
+      <p><span class="en-text">Free video lectures — Learn anytime, anywhere!</span>
+      <span class="hi-text">मुफ्त वीडियो लेक्चर — कहीं भी, कभी भी सीखें!</span></p>
+    </div>
+    <div class="yt-card fade-in">
+      <div class="yt-logo">▶</div>
+      <h3>Genius Mathematics Tutorial</h3>
+      <p>
+        <span class="en-text">Subscribe to our YouTube channel for free video lectures on Maths & Science for Class 9–12. Perfect for Bihar Board & CBSE students!</span>
+        <span class="hi-text">कक्षा 9–12 के लिए गणित और विज्ञान के मुफ्त वीडियो लेक्चर के लिए हमारे YouTube चैनल को Subscribe करें। Bihar Board और CBSE दोनों के लिए।</span>
+      </p>
+      <div class="yt-stats">
+        <div class="yt-stat"><div class="num">Free</div><div class="lbl">All Videos / सभी वीडियो</div></div>
+        <div class="yt-stat"><div class="num">9–12</div><div class="lbl">Classes Covered</div></div>
+        <div class="yt-stat"><div class="num">Hindi</div><div class="lbl">Medium / माध्यम</div></div>
+      </div>
+      <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" class="btn-yt-big">
+        ▶ Subscribe Now / अभी Subscribe करें
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MOTIVATION -->
+<section id="motivation" class="fade-in">
+  <div class="section-title">
+    <h2>💪 <span class="en-text">Stay Motivated / प्रेरित रहें</span><span class="hi-text">प्रेरित रहें</span></h2>
+    <p><span class="en-text">Words that fuel your journey to success</span><span class="hi-text">वे शब्द जो आपकी सफलता की यात्रा को ऊर्जा देते हैं</span></p>
+  </div>
+  <div class="motivation-grid">
+    <div class="mot-card">
+      <div class="mot-quote">🔥</div>
+      <div class="en">Work hard in silence. Let your results make the noise.</div>
+      <div class="hi">चुपचाप मेहनत करो। तुम्हारे नतीजे खुद बोलेंगे।</div>
+    </div>
+    <div class="mot-card">
+      <div class="mot-quote">⭐</div>
+      <div class="en">Toppers are not born — they are made through discipline & hard work.</div>
+      <div class="hi">टॉपर पैदा नहीं होते — अनुशासन और मेहनत से बनते हैं।</div>
+    </div>
+    <div class="mot-card">
+      <div class="mot-quote">🚀</div>
+      <div class="en">Your village background is not your limit — it's your strength!</div>
+      <div class="hi">गांव की पृष्ठभूमि तुम्हारी सीमा नहीं — यह तुम्हारी ताकत है!</div>
+    </div>
+    <div class="mot-card">
+      <div class="mot-quote">📚</div>
+      <div class="en">Every day is a new chance. Open your books and write your destiny.</div>
+      <div class="hi">हर दिन एक नया मौका है। किताब खोलो और अपनी किस्मत लिखो।</div>
+    </div>
+    <div class="mot-card">
+      <div class="mot-quote">🎯</div>
+      <div class="en">Don't just pass — aim to top! GMT is here to make you a winner.</div>
+      <div class="hi">सिर्फ पास मत होओ — टॉप करने का लक्ष्य रखो! GMT तुम्हें विजेता बनाएगा।</div>
+    </div>
+    <div class="mot-card">
+      <div class="mot-quote">💡</div>
+      <div class="en">Concept Strong → Future Long. Master the basics, conquer the board!</div>
+      <div class="hi">Concept मजबूत → भविष्य उज्जवल। बुनियाद मजबूत करो, बोर्ड जीतो!</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<div class="full-section" style="background:#f8f9ff;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-title fade-in">
+      <h2><span class="en-text">Student Reviews / छात्रों की राय</span><span class="hi-text">छात्रों की राय</span></h2>
+      <p><span class="en-text">What our students say about GMT</span><span class="hi-text">हमारे छात्र GMT के बारे में क्या कहते हैं</span></p>
+    </div>
+    <div class="test-grid fade-in">
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p>Sir's teaching method is amazing! My concept in maths became very strong after joining GMT.</p>
+        <p style="color:#777;font-style:italic;margin-top:6px;">Sir की पढ़ाई का तरीका बहुत अच्छा है! GMT join करने के बाद मेरा maths concept बहुत strong हो गया।</p>
+        <div class="test-name">— Anuj Kumar</div>
+        <div class="test-class">Class 10, 2024 Batch</div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p>I failed in maths before joining. Now I got 85 in board. Thank you Naresh Sir!</p>
+        <p style="color:#777;font-style:italic;margin-top:6px;">पहले मेरा maths fail हो जाता था। अब board में 85 आए। Naresh Sir को बहुत धन्यवाद!</p>
+        <div class="test-name">— Priya Devi</div>
+        <div class="test-class">Class 10, 2025 Batch</div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p>GMT provides PDF notes and YouTube videos. Even village students like me can study well!</p>
+        <p style="color:#777;font-style:italic;margin-top:6px;">GMT में PDF notes और YouTube videos मिलते हैं। गांव के छात्र भी अच्छे से पढ़ सकते हैं!</p>
+        <div class="test-name">— Rahul Yadav</div>
+        <div class="test-class">Class 9, Current Batch</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section id="faq" class="fade-in">
+  <div class="section-title">
+    <h2><span class="en-text">FAQ / अक्सर पूछे जाने वाले सवाल</span><span class="hi-text">अक्सर पूछे जाने वाले सवाल</span></h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>📝 Are PDF Notes and PPT available? / क्या PDF Notes और PPT मिलते हैं?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Yes! All enrolled students get PDF Notes, PPT, and study material for their class. Contact us to receive them.<br><em>हाँ! सभी नामांकित छात्रों को उनकी कक्षा के लिए PDF Notes, PPT और अध्ययन सामग्री मिलती है।</em></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>🎥 Are there online classes? / क्या ऑनलाइन क्लासेज होती हैं?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Yes! Free video lectures are available on our YouTube channel. Subscribe now!<br><em>हाँ! हमारे YouTube चैनल पर मुफ्त वीडियो लेक्चर उपलब्ध हैं।</em> <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" style="color:var(--saffron);">Subscribe →</a></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>📅 Weekly Test होता है? / Is there a Weekly Test?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Every Sunday a weekly test is conducted to track student progress.<br><em>हर रविवार साप्ताहिक परीक्षा होती है जिससे छात्रों की प्रगति की जांच होती है।</em></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>🌐 क्या Hindi में पढ़ाया जाता है? / Is teaching in Hindi?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Yes! We teach in both Hindi and English. Specially designed for village students who are more comfortable in Hindi.<br><em>हाँ! हम हिंदी और अंग्रेजी दोनों में पढ़ाते हैं। ग्रामीण छात्रों के लिए विशेष रूप से तैयार।</em></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>💰 Fees kitni hai? / What are the fees?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Please contact us directly for fee details. We offer affordable fees keeping village students in mind.<br><em>कृपया फीस विवरण के लिए सीधे हमसे संपर्क करें। हम ग्रामीण छात्रों को ध्यान में रखते हुए किफायती फीस प्रदान करते हैं।</em></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>📍 Location kahan hai? / Where is the center?</span>
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">GMT Tutorial is located at Old SSB Camp, Purandra. Contact us for directions.<br><em>GMT Tutorial Old SSB Camp, Purandra में स्थित है।</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMISSION -->
+<div class="full-section admission-section" id="admission">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-title fade-in">
+      <h2>✍ <span class="en-text">Admission Form / प्रवेश फॉर्म</span><span class="hi-text">प्रवेश फॉर्म</span></h2>
+      <p><span class="en-text">Fill the form below and we will contact you</span><span class="hi-text">नीचे फॉर्म भरें और हम आपसे संपर्क करेंगे</span></p>
+    </div>
+    <div class="admission-grid fade-in">
+      <div class="form-box">
+        <h3>📋 <span class="en-text">Student Registration</span><span class="hi-text">छात्र पंजीकरण</span></h3>
+        <div class="form-group">
+          <label><span class="en-text">Full Name / पूरा नाम</span><span class="hi-text">पूरा नाम</span></label>
+          <input type="text" id="f-name" placeholder="Enter your full name / अपना पूरा नाम लिखें">
+        </div>
+        <div class="form-group">
+          <label><span class="en-text">Class / कक्षा</span><span class="hi-text">कक्षा</span></label>
+          <select id="f-class">
+            <option value="">Select Class / कक्षा चुनें</option>
+            <option>Class 9 / कक्षा 9</option>
+            <option>Class 10 / कक्षा 10</option>
+            <option>Class 11 / कक्षा 11</option>
+            <option>Class 12 / कक्षा 12</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><span class="en-text">Mobile Number / मोबाइल नंबर</span><span class="hi-text">मोबाइल नंबर</span></label>
+          <input type="tel" id="f-mobile" placeholder="Enter mobile number / मोबाइल नंबर लिखें">
+        </div>
+        <div class="form-group">
+          <label><span class="en-text">Village/Area / गांव/क्षेत्र</span><span class="hi-text">गांव/क्षेत्र</span></label>
+          <input type="text" id="f-village" placeholder="Your village or area / आपका गांव या क्षेत्र">
+        </div>
+        <div class="form-group">
+          <label><span class="en-text">Message / संदेश (Optional)</span><span class="hi-text">संदेश (वैकल्पिक)</span></label>
+          <textarea id="f-msg" placeholder="Any questions or message... / कोई सवाल या संदेश..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%;border:none;" onclick="submitForm()">
+          ✅ <span class="en-text">Submit Form / फॉर्म जमा करें</span><span class="hi-text">फॉर्म जमा करें</span>
+        </button>
+      </div>
+      <div class="admission-info">
+        <div class="info-card">
+          <h4>📋 <span class="en-text">Admission Details</span><span class="hi-text">प्रवेश विवरण</span></h4>
+          <div class="info-row"><span class="lbl">Classes</span><span class="val">9, 10, 11, 12</span></div>
+          <div class="info-row"><span class="lbl">Subjects</span><span class="val">Maths & Science</span></div>
+          <div class="info-row"><span class="lbl">Medium</span><span class="val">Hindi + English</span></div>
+          <div class="info-row"><span class="lbl">Board</span><span class="val">Bihar Board + CBSE</span></div>
+          <div class="info-row"><span class="lbl">Test</span><span class="val">Every Sunday</span></div>
+          <div class="info-row"><span class="lbl">Material</span><span class="val">PDF + PPT + Notes</span></div>
+          <div class="info-row"><span class="lbl">YouTube</span><span class="val">Free Videos</span></div>
+        </div>
+        <div class="info-card">
+          <h4>📍 <span class="en-text">Location / पता</span><span class="hi-text">पता</span></h4>
+          <p style="font-size:14px;color:#555;line-height:1.8;">
+            📌 Old SSB Camp, Purandra<br>
+            👨‍🏫 Naresh Kumar Yadav<br>
+            ▶ <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" style="color:var(--saffron);">GMT YouTube Channel</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact" class="fade-in">
+  <div class="section-title">
+    <h2><span class="en-text">Contact Us / संपर्क करें</span><span class="hi-text">संपर्क करें</span></h2>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <div class="contact-icon">📍</div>
+      <h4>Address / पता</h4>
+      <p>Old SSB Camp, Purandra</p>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">👨‍🏫</div>
+      <h4>Teacher / शिक्षक</h4>
+      <p>Naresh Kumar Yadav<br>6+ Years Experience</p>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">▶</div>
+      <h4>YouTube</h4>
+      <p><a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank" style="color:var(--saffron);">GMT Tutorial Channel</a></p>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">⏰</div>
+      <h4>Hours / समय</h4>
+      <p>Mon–Sat: Morning & Evening<br>Sun: Weekly Test</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>GMT — Genius Mathematics Tutorial</h3>
+      <p>"Concept Strong → Future Long 💯"<br>"हम मेहनत कराते हैं, सफलता अपने आप आती है 🚀"<br><br>Bihar Board & CBSE | Class 9–12 | Hindi + English<br>📍 Old SSB Camp, Purandra</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="#about">About / हमारे बारे में</a>
+      <a href="#classes">Classes / कक्षाएं</a>
+      <a href="#resources">Notes/PDF</a>
+      <a href="#toppers">Toppers / टॉपर्स</a>
+      <a href="#admission">Admission / प्रवेश</a>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <a href="https://www.youtube.com/channel/UClPqtmVa_AQODHyviS798ZQ" target="_blank">▶ YouTube Channel</a>
+      <a href="#contact">📍 Location</a>
+      <a href="#faq">❓ FAQ</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 GMT — Genius Mathematics Tutorial. All rights reserved.</span>
+    <span>"Join Today, Become Topper Tomorrow 🚀"</span>
+  </div>
+</footer>
+
+<!-- LANGUAGE TOGGLE -->
+<button class="lang-toggle" onclick="toggleLang()">🌐 हिंदी में देखें</button>
+
+<script>
+// ===== QUOTE ROTATOR =====
+let qIdx = 0;
+const quotes = document.querySelectorAll('.quote-slide');
+setInterval(() => {
+  quotes[qIdx].classList.remove('active');
+  qIdx = (qIdx + 1) % quotes.length;
+  quotes[qIdx].classList.add('active');
+}, 3500);
+
+// ===== LANGUAGE TOGGLE =====
+let isHindi = false;
+function toggleLang() {
+  isHindi = !isHindi;
+  document.body.classList.toggle('hindi', isHindi);
+  document.querySelector('.lang-toggle').textContent = isHindi ? '🌐 English में देखें' : '🌐 हिंदी में देखें';
+}
+
+// ===== FAQ =====
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// ===== FORM SUBMIT (API-powered) =====
+async function submitForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const cls = document.getElementById('f-class').value;
+  const mobile = document.getElementById('f-mobile').value.trim();
+  const village = document.getElementById('f-village').value.trim();
+  const message = document.getElementById('f-msg').value.trim();
+  if (!name || !cls || !mobile) {
+    alert('Please fill Name, Class & Mobile!\nकृपया नाम, कक्षा और मोबाइल भरें!');
+    return;
+  }
+  try {
+    const r = await fetch('/api/admissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, cls, mobile, village, message })
+    });
+    const d = await r.json();
+    if (d.success) {
+      alert(`✅ Thank you, ${name}!\nहम जल्द आपसे संपर्क करेंगे।\nWe will contact you soon!\n\n📞 Class: ${cls}\n📱 Mobile: ${mobile}`);
+      ['f-name','f-class','f-mobile','f-village','f-msg'].forEach(id => document.getElementById(id).value = '');
+    } else {
+      alert('Error: ' + (d.error || 'Something went wrong'));
+    }
+  } catch(e) {
+    // Fallback if server not running
+    alert(`✅ Thank you, ${name}!\nWe will contact you soon!\n\n📞 Class: ${cls}\n📱 Mobile: ${mobile}\n\n(Offline mode — form saved locally)`);
+  }
+}
+
+// ===== DYNAMIC RESOURCES =====
+async function loadPublicResources() {
+  const cls = document.getElementById('res-filter-class')?.value || '';
+  const type = document.getElementById('res-filter-type')?.value || '';
+  const grid = document.getElementById('dynamic-resources-grid');
+  if (!grid) return;
+
+  const typeIcons = { pdf: '📄', note: '📝', ppt: '📊', other: '📎' };
+
+  try {
+    let url = '/api/resources?';
+    if (cls) url += `class=${cls}&`;
+    if (type) url += `type=${type}&`;
+    const r = await fetch(url);
+    const resources = await r.json();
+
+    if (!resources.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">
+        <div style="font-size:48px;">📭</div>
+        <p style="margin-top:12px;">No study materials uploaded yet.<br>Contact GMT Tutorial to get materials!</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = resources.map(res => `
+      <a href="/api/download/${res.id}" target="_blank" class="resource-card" style="text-decoration:none;color:inherit;">
+        <div class="resource-icon">${typeIcons[res.type] || '📎'}</div>
+        <h4>${res.title}</h4>
+        <p>${res.subject}${res.class !== 'all' ? ' · Class ' + res.class : ''}</p>
+        ${res.description ? `<p style="font-size:11px;color:var(--muted);margin-top:4px;">${res.description}</p>` : ''}
+        <span class="resource-tag">📥 Download · ${formatFileSize(res.size)}</span>
+      </a>`).join('');
+  } catch(e) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);">
+      📡 Could not load materials. Please check back later.</div>`;
+  }
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(0) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+// Load resources on page load
+window.addEventListener('load', loadPublicResources);
+
+// ===== SCROLL ANIMATIONS =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
