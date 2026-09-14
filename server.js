@@ -76,13 +76,11 @@ app.use(session({ secret:'gmt-2026-secret', resave:false, saveUninitialized:fals
 app.use(express.static(path.join(ROOT,'public')));
 app.use('/uploads', express.static(path.join(ROOT,'uploads')));
 
-// ── Multer ─────────────────────────────────────────────────────────────────
-// // Cloudinary Storage Setup
-// // Cloudinary Storage Setup
+// Multer Cloudinary Storage Setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    const cat = CATEGORIES[req.body.type] || CATEGORIES.pdf;
+    const cat = CATEGORIES[req.body.type] || CATEGORIES.general;
     const ext = path.extname(file.originalname).toLowerCase();
     const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
     const finalFilename = `${base}_${Date.now()}`;
@@ -91,24 +89,21 @@ const storage = new CloudinaryStorage({
       folder: `gmt_uploads/${cat.folder || 'general'}`,
       public_id: finalFilename,
       resource_type: 'auto',
+      allowed_Formats: ['jpg', 'png', 'jpeg', 'pdf']
     };
-  },
+  }
 });
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  if (ALL_EXTS.includes(ext)) {
+  if (!ALL_EXTS.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error(`File type "${ext}" not allowed.`));
+    cb(new Error(`File type ${ext} not allowed.`), false);
   }
 };
 
-const upload = multer({ 
-  storage: storage, 
-  fileFilter: fileFilter,
-  limits: { fileSize: MAX_SIZE } 
-});
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 // ── Auth middleware ────────────────────────────────────────────────────────
 const auth=(req,res,next)=>{ if(req.session?.isAdmin) return next(); res.status(401).json({error:'Unauthorized'}); };
