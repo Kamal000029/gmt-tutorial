@@ -282,12 +282,21 @@ section {
   color: white;
 }
 .teacher-avatar {
-  width: 110px; height: 110px;
-  border-radius: 50%;
-  border: 4px solid var(--gold);
-  background: linear-gradient(135deg, var(--saffron), var(--gold));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px; margin: 0 auto 16px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid var(--gold);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px auto;
+}
+
+.teacher-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 .about-img-box h3 { font-family: 'Baloo 2', cursive; font-size: 22px; }
 .about-img-box p { font-size: 13px; color: #c8d8ff; margin-top: 5px; }
@@ -780,12 +789,12 @@ body.hindi .hi-text { display: inline; }
   <div class="about-grid">
     <div class="about-img-box">
         <div class="teacher-avatar">
-            <!-- यहाँ अपनी इमेज का सही पाथ (path) डालें -->
-            <img src="images/NARESH.jpeg" alt="Naresh Kumar Yadav" style="width: 100%; height: auto; border-radius: 50%;">
+            <!-- इसके अंदर का पुराना टेक्स्ट हटाकर सिर्फ यह इमेज टैग डालें -->
+            <img src="NARESH.jpeg" alt="Naresh Kumar Yadav" class="avatar-img">
         </div>
         <h3>Naresh Kumar Yadav</h3>
+        <p>Head Teacher & Founder, GMT Tutorial</p>
         
-      <p>Head Teacher & Founder, GMT Tutorial</p>
       <p style="margin-top:16px;font-size:13px;opacity:0.8;">📍 Old SSB Camp, Purandra<br>🎓 Bihar Board + CBSE Expert<br>⏳ 6+ Years Teaching Experience</p>
     </div>
     <ul class="about-features">
