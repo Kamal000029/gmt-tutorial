@@ -851,22 +851,7 @@ body.hindi .hi-text { display: inline; }
     <p style="color:#a0b4e8;"><span class="en-text">Latest updates and announcements</span><span class="hi-text">नवीनतम अपडेट और घोषणाएं</span></p>
   </div>
   <div class="notice-grid">
-    <div class="notice-card">
-      <div class="notice-tag">🔴 New / नया</div>
-      <p><strong>New Batch Starting Soon!</strong><br>नया बैच जल्द शुरू होगा। अभी Registration कराएं।</p>
-    </div>
-    <div class="notice-card">
-      <div class="notice-tag">📅 Weekly</div>
-      <p><strong>Weekly Test Every Sunday</strong><br>हर रविवार साप्ताहिक परीक्षा होगी। तैयार रहें।</p>
-    </div>
-    <div class="notice-card">
-      <div class="notice-tag">📚 Special</div>
-      <p><strong>Class 10 Board Special Batch</strong><br>Class 10 बोर्ड परीक्षा के लिए विशेष बैच उपलब्ध।</p>
-    </div>
-    <div class="notice-card">
-      <div class="notice-tag">📄 Notes</div>
-      <p><strong>PDF Notes Now Available</strong><br>सभी Classes के PDF Notes डाउनलोड करें।</p>
-    </div>
+    <div class="notice-grid" id="dynamic-notices-container"></div>
   </div>
 </div>
 
@@ -1337,6 +1322,30 @@ body.hindi .hi-text { display: inline; }
 <button class="lang-toggle" onclick="toggleLang()">🌐 हिंदी में देखें</button>
 
 <script>
+  // ===== ADMIN NOTICES =====
+async function showAdminNotices() {
+  try {
+    const res = await fetch('/api/notices'); 
+    const data = await res.json();
+    
+    const box = document.getElementById('dynamic-notices-container');
+    if (!box) return;
+    box.innerHTML = ""; 
+
+    data.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'notice-card';
+      card.innerHTML = `
+        <div class="notice-tag">Notice</div>
+        <p><strong>${item.title}</strong><br>${item.content}</p>
+      `;
+      box.appendChild(card);
+    });
+  } catch (err) {
+    console.log("नोटिस लोड नहीं हो पाया:", err);
+  }
+}
+document.addEventListener('DOMContentLoaded', showAdminNotices);
 // ===== QUOTE ROTATOR =====
 let qIdx = 0;
 const quotes = document.querySelectorAll('.quote-slide');
