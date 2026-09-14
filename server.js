@@ -1,5 +1,5 @@
 /**
- * GMT Tutorial Backend v2.2 (Production Ready)
+ * GMT Tutorial Backend v2.0
  * Genius Mathematics Tutorial — Naresh Kumar Yadav
  */
 require('dotenv').config();
@@ -15,13 +15,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
-
 // ── Admin Credentials ──────────────────────────────────────────────────────
 const ADMIN = { username: 'gmt_admin', password: 'GMT@2026#Naresh' };
 
@@ -78,11 +76,12 @@ app.use(session({ secret:'gmt-2026-secret', resave:false, saveUninitialized:fals
 app.use(express.static(path.join(ROOT,'public')));
 app.use('/uploads', express.static(path.join(ROOT,'uploads')));
 
-// Multer Cloudinary Storage Setup
+// ── Multer ─────────────────────────────────────────────────────────────────
+// // Cloudinary Storage Setup
+// // Cloudinary Storage Setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    // FIXED: Fallback safely to pdf category if type is undefined to prevent crashes
     const cat = CATEGORIES[req.body.type] || CATEGORIES.pdf;
     const ext = path.extname(file.originalname).toLowerCase();
     const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
@@ -92,29 +91,29 @@ const storage = new CloudinaryStorage({
       folder: `gmt_uploads/${cat.folder || 'general'}`,
       public_id: finalFilename,
       resource_type: 'auto',
-      // FIXED: Corrected case sensitivity to lowercase allowed_formats
-      allowed_formats: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx', 'txt', 'rtf', 'epub', 'mp4', 'webm', 'ogg', 'mov', 'ppt', 'pptx']
     };
-  }
+  },
 });
 
-// FIXED: Corrected logic inversion. Keeps valid file extensions instead of filtering them out.
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ALL_EXTS.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error(`File type ${ext} not allowed.`), false);
+    cb(new Error(`File type "${ext}" not allowed.`));
   }
 };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { fileSize: MAX_SIZE } });
+const upload = multer({ 
+  storage: storage, 
+  fileFilter: fileFilter,
+  limits: { fileSize: MAX_SIZE } 
+});
 
 // ── Auth middleware ────────────────────────────────────────────────────────
 const auth=(req,res,next)=>{ if(req.session?.isAdmin) return next(); res.status(401).json({error:'Unauthorized'}); };
 
 // ── Helper: build resource object ─────────────────────────────────────────
-// FIXED: Maps resource URL property directly to cloud file path (file.path)
 function buildResource(req,file) {
   const {title,description,classLevel,subject,type,tags,year,chapter,language,isPinned}=req.body;
   const safeType=CATEGORIES[type]?type:'pdf';
@@ -128,9 +127,9 @@ function buildResource(req,file) {
     subject:     (subject||'General').trim(),
     type:        safeType,
     typeLabel:   cat.label,
-    filename:    file.filename || file.public_id,
+    filename:    file.filename,
     originalName:file.originalname,
-    url:         file.path, // 👈 Cloudinary secure path
+    url:         `/uploads/${cat.folder}/${file.filename}`,
     size:        file.size,
     sizeLabel:   fmtBytes(file.size),
     ext,
@@ -162,26 +161,10 @@ app.post('/api/admin/logout',(req,res)=>{ req.session.destroy(); res.json({succe
 app.get('/api/admin/check',(req,res)=>res.json({isAdmin:!!req.session?.isAdmin,username:req.session?.username||null}));
 
 // ═══════════════════════════════════════════════════════════════════
-//  PUBLIC & UPLOAD ROUTES
+//  PUBLIC ROUTES
 // ═══════════════════════════════════════════════════════════════════
-app.get('/api/settings',(req,res)=>res.json(readSettings()));
 
-// FIXED: Re-injected the missing POST endpoint logic required to upload files to your server
-app.post('/api/resources', auth, upload.single('file'), (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    
-    const dbData = read(DB.resources);
-    const newResource = buildResource(req, req.file);
-    
-    dbData.push(newResource);
-    write(DB.resources, dbData);
-    
-    res.json({ success: true, data: newResource });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+app.get('/api/settings',(req,res)=>res.json(readSettings()));
 
 app.get('/api/resources',(req,res)=>{
   let r=read(DB.resources).filter(r=>r.visible!==false);
@@ -192,13 +175,196 @@ app.get('/api/resources',(req,res)=>{
   if (year)    r=r.filter(x=>x.year===year);
   if (pinned==='true') r=r.filter(x=>x.isPinned);
   if (search)  { const q=search.toLowerCase(); r=r.filter(x=>x.title.toLowerCase().includes(q)||x.description?.toLowerCase().includes(q)||x.subject?.toLowerCase().includes(q)||x.tags?.some(t=>t.toLowerCase().includes(q))); }
-  
-  // FIXED: Completed the broken array sorting structure missing from the initial prompt template
-  r.sort((a,b)=>(b.isPinned?1:0)-(a.isPinned?1:0) || new Date(b.uploadedAt) - new Date(a.uploadedAt));
+  r.sort((a,b)=>(b.isPinned?1:0)-(a.isPinned?1:0)||new Date(b.uploadedAt)-new Date(a.uploadedAt));
   res.json(r);
 });
 
-// Server Start Setup
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.get('/api/resources/:id',(req,res)=>{
+  const r=read(DB.resources); const i=r.findIndex(x=>x.id===req.params.id&&x.visible!==false);
+  if (i===-1) return res.status(404).json({error:'Not found'});
+  r[i].views=(r[i].views||0)+1; write(DB.resources,r); res.json(r[i]);
+});
+
+app.get('/api/download/:id',(req,res)=>{
+  const r=read(DB.resources); const i=r.findIndex(x=>x.id===req.params.id);
+  if (i===-1) return res.status(404).json({error:'Not found'});
+  r[i].downloads=(r[i].downloads||0)+1; write(DB.resources,r); res.redirect(r[i].url);
+});
+
+app.get('/api/notices',(req,res)=>res.json(read(DB.notices).filter(n=>n.active!==false).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))));
+app.get('/api/gallery',(req,res)=>res.json(read(DB.gallery).filter(g=>g.visible!==false).sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt))));
+app.get('/api/testimonials',(req,res)=>res.json(read(DB.testimonials).filter(t=>t.visible!==false)));
+
+app.post('/api/admissions',(req,res)=>{
+  const {name,cls,mobile,village,school,parentName,parentMobile,message}=req.body;
+  if (!name||!cls||!mobile) return res.status(400).json({error:'Name, Class and Mobile are required.'});
+  if (!/^\d{10}$/.test(mobile)) return res.status(400).json({error:'Mobile must be 10 digits.'});
+  const a=read(DB.admissions);
+  const entry={id:uuidv4(),name:name.trim(),class:cls,mobile:mobile.trim(),village:(village||'').trim(),school:(school||'').trim(),parentName:(parentName||'').trim(),parentMobile:(parentMobile||'').trim(),message:(message||'').trim(),submittedAt:new Date().toISOString(),status:'new',notes:''};
+  a.unshift(entry); write(DB.admissions,a);
+  res.json({success:true,message:'Admission form submitted! We will contact you soon.',id:entry.id});
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — RESOURCES
+// ═══════════════════════════════════════════════════════════════════
+
+app.post('/api/admin/resources/upload', auth,(req,res)=>{
+  upload.single('file')(req,res,err=>{
+    if (err) { if (err.code==='LIMIT_FILE_SIZE') return res.status(400).json({error:`File too large. Max ${fmtBytes(MAX_SIZE)}.`}); return res.status(400).json({error:err.message}); }
+    if (!req.file) return res.status(400).json({error:'No file uploaded.'});
+    if (!req.body.title) return res.status(400).json({error:'Title is required.'});
+    const resource=buildResource(req,req.file);
+    const r=read(DB.resources); r.unshift(resource); write(DB.resources,r);
+    res.json({success:true,resource});
+  });
+});
+
+app.post('/api/admin/resources/upload-bulk', auth,(req,res)=>{
+  upload.array('files',20)(req,res,err=>{
+    if (err) { if (err.code==='LIMIT_FILE_SIZE') return res.status(400).json({error:`A file is too large. Max ${fmtBytes(MAX_SIZE)}.`}); return res.status(400).json({error:err.message}); }
+    if (!req.files?.length) return res.status(400).json({error:'No files uploaded.'});
+    const r=read(DB.resources);
+    const uploaded=req.files.map(file=>{
+      const obj=buildResource(req,file);
+      if (!req.body.title) obj.title=path.basename(file.originalname,path.extname(file.originalname)).replace(/[_-]+/g,' ');
+      r.unshift(obj); return obj;
+    });
+    write(DB.resources,r); res.json({success:true,count:uploaded.length,resources:uploaded});
+  });
+});
+
+app.get('/api/admin/resources', auth,(req,res)=>{
+  let r=read(DB.resources);
+  const {search,type,class:cls,subject}=req.query;
+  if (type)    r=r.filter(x=>x.type===type);
+  if (cls)     r=r.filter(x=>x.class===cls);
+  if (subject) r=r.filter(x=>x.subject?.toLowerCase().includes(subject.toLowerCase()));
+  if (search)  { const q=search.toLowerCase(); r=r.filter(x=>x.title.toLowerCase().includes(q)||x.originalName?.toLowerCase().includes(q)); }
+  res.json(r.sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt)));
+});
+
+app.patch('/api/admin/resources/:id', auth,(req,res)=>{
+  const r=read(DB.resources); const i=r.findIndex(x=>x.id===req.params.id);
+  if (i===-1) return res.status(404).json({error:'Not found.'});
+  const {id,filename,url,size,ext,uploadedAt,uploadedBy,...allowed}=req.body;
+  r[i]={...r[i],...allowed,updatedAt:new Date().toISOString()}; write(DB.resources,r);
+  res.json({success:true,resource:r[i]});
+});
+
+app.delete('/api/admin/resources/:id', auth,(req,res)=>{
+  const r=read(DB.resources); const i=r.findIndex(x=>x.id===req.params.id);
+  if (i===-1) return res.status(404).json({error:'Not found.'});
+  const cat=CATEGORIES[r[i].type]||CATEGORIES.pdf;
+  const fp=path.join(ROOT,'uploads',cat.folder,r[i].filename);
+  if (fs.existsSync(fp)) { try{fs.unlinkSync(fp);}catch(e){console.error(e);} }
+  r.splice(i,1); write(DB.resources,r); res.json({success:true});
+});
+
+app.post('/api/admin/resources/bulk-delete', auth,(req,res)=>{
+  const {ids}=req.body; if (!Array.isArray(ids)||!ids.length) return res.status(400).json({error:'No IDs provided.'});
+  let r=read(DB.resources); let deleted=0;
+  ids.forEach(id=>{ const i=r.findIndex(x=>x.id===id); if(i===-1)return; const cat=CATEGORIES[r[i].type]||CATEGORIES.pdf; const fp=path.join(ROOT,'uploads',cat.folder,r[i].filename); if(fs.existsSync(fp)){try{fs.unlinkSync(fp);}catch{}} r.splice(i,1); deleted++; });
+  write(DB.resources,r); res.json({success:true,deleted});
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — GALLERY
+// ═══════════════════════════════════════════════════════════════════
+const galleryUpload=multer({storage:multer.diskStorage({destination(req,file,cb){cb(null,path.join(ROOT,'uploads','images'));},filename(req,file,cb){const ext=path.extname(file.originalname).toLowerCase();cb(null,`gallery_${Date.now()}_${Math.random().toString(36).slice(2,7)}${ext}`);}}),fileFilter:(req,file,cb)=>{const ext=path.extname(file.originalname).toLowerCase();['.jpg','.jpeg','.png','.gif','.webp'].includes(ext)?cb(null,true):cb(new Error('Only image files allowed.'));},limits:{fileSize:10*1024*1024}});
+
+app.post('/api/admin/gallery/upload', auth,(req,res)=>{
+  galleryUpload.array('images',30)(req,res,err=>{
+    if(err) return res.status(400).json({error:err.message});
+    if(!req.files?.length) return res.status(400).json({error:'No images uploaded.'});
+    const g=read(DB.gallery);
+    const uploaded=req.files.map(file=>{ const item={id:uuidv4(),url:`/uploads/images/${file.filename}`,filename:file.filename,caption:req.body.caption||'',category:req.body.category||'general',visible:true,uploadedAt:new Date().toISOString()}; g.unshift(item); return item; });
+    write(DB.gallery,g); res.json({success:true,count:uploaded.length,images:uploaded});
+  });
+});
+
+app.get('/api/admin/gallery', auth,(req,res)=>res.json(read(DB.gallery).sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt))));
+app.patch('/api/admin/gallery/:id', auth,(req,res)=>{ const g=read(DB.gallery); const i=g.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); g[i]={...g[i],...req.body}; write(DB.gallery,g); res.json({success:true,item:g[i]}); });
+app.delete('/api/admin/gallery/:id', auth,(req,res)=>{ const g=read(DB.gallery); const i=g.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); const fp=path.join(ROOT,'uploads','images',g[i].filename); if(fs.existsSync(fp)){try{fs.unlinkSync(fp);}catch{}} g.splice(i,1); write(DB.gallery,g); res.json({success:true}); });
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — NOTICES
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/admin/notices', auth,(req,res)=>res.json(read(DB.notices).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))));
+app.post('/api/admin/notices', auth,(req,res)=>{ const {title,body,type,expiresAt}=req.body; if(!title)return res.status(400).json({error:'Title required.'}); const n=read(DB.notices); const notice={id:uuidv4(),title:title.trim(),body:(body||'').trim(),type:type||'info',expiresAt:expiresAt||null,active:true,createdAt:new Date().toISOString(),createdBy:req.session.username}; n.unshift(notice); write(DB.notices,n); res.json({success:true,notice}); });
+app.patch('/api/admin/notices/:id', auth,(req,res)=>{ const n=read(DB.notices); const i=n.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); n[i]={...n[i],...req.body,updatedAt:new Date().toISOString()}; write(DB.notices,n); res.json({success:true,notice:n[i]}); });
+app.delete('/api/admin/notices/:id', auth,(req,res)=>{ const n=read(DB.notices); const i=n.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); n.splice(i,1); write(DB.notices,n); res.json({success:true}); });
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — TESTIMONIALS
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/admin/testimonials', auth,(req,res)=>res.json(read(DB.testimonials)));
+app.post('/api/admin/testimonials', auth,(req,res)=>{ const {studentName,class:cls,text,rating,school}=req.body; if(!studentName||!text)return res.status(400).json({error:'Name and text required.'}); const t=read(DB.testimonials); const entry={id:uuidv4(),studentName:studentName.trim(),class:cls||'',school:school||'',text:text.trim(),rating:Math.min(5,Math.max(1,parseInt(rating)||5)),visible:true,createdAt:new Date().toISOString()}; t.unshift(entry); write(DB.testimonials,t); res.json({success:true,testimonial:entry}); });
+app.patch('/api/admin/testimonials/:id', auth,(req,res)=>{ const t=read(DB.testimonials); const i=t.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); t[i]={...t[i],...req.body}; write(DB.testimonials,t); res.json({success:true,testimonial:t[i]}); });
+app.delete('/api/admin/testimonials/:id', auth,(req,res)=>{ const t=read(DB.testimonials); const i=t.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); t.splice(i,1); write(DB.testimonials,t); res.json({success:true}); });
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — ADMISSIONS
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/admin/admissions', auth,(req,res)=>{ let a=read(DB.admissions); const{status,search}=req.query; if(status)a=a.filter(x=>x.status===status); if(search){const q=search.toLowerCase();a=a.filter(x=>x.name?.toLowerCase().includes(q)||x.mobile?.includes(q)||x.village?.toLowerCase().includes(q));} res.json(a.sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt))); });
+app.patch('/api/admin/admissions/:id', auth,(req,res)=>{ const a=read(DB.admissions); const i=a.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); a[i]={...a[i],...req.body,updatedAt:new Date().toISOString()}; write(DB.admissions,a); res.json({success:true,admission:a[i]}); });
+app.delete('/api/admin/admissions/:id', auth,(req,res)=>{ const a=read(DB.admissions); const i=a.findIndex(x=>x.id===req.params.id); if(i===-1)return res.status(404).json({error:'Not found.'}); a.splice(i,1); write(DB.admissions,a); res.json({success:true}); });
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/admin/settings', auth,(req,res)=>res.json(readSettings()));
+app.post('/api/admin/settings', auth,(req,res)=>{ const s={...readSettings(),...req.body,updatedAt:new Date().toISOString()}; write(DB.settings,s); res.json({success:true,settings:s}); });
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — STATS
+// ═══════════════════════════════════════════════════════════════════
+app.get('/api/admin/stats', auth,(req,res)=>{
+  const r=read(DB.resources), a=read(DB.admissions), n=read(DB.notices), g=read(DB.gallery);
+  const breakdown={};
+  Object.keys(CATEGORIES).forEach(t=>{ breakdown[t]=r.filter(x=>x.type===t).length; });
+  const storage=r.reduce((s,x)=>s+(x.size||0),0);
+  res.json({
+    totalResources:r.length, visibleResources:r.filter(x=>x.visible!==false).length,
+    typeBreakdown:breakdown,
+    totalAdmissions:a.length, newAdmissions:a.filter(x=>x.status==='new').length,
+    contactedAdmissions:a.filter(x=>x.status==='contacted').length, enrolledAdmissions:a.filter(x=>x.status==='enrolled').length,
+    totalDownloads:r.reduce((s,x)=>s+(x.downloads||0),0), totalViews:r.reduce((s,x)=>s+(x.views||0),0),
+    activeNotices:n.filter(x=>x.active!==false).length, totalNotices:n.length, galleryImages:g.length,
+    storageUsed:fmtBytes(storage), storageUsedBytes:storage,
+    recentResources:r.sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt)).slice(0,5),
+    recentAdmissions:a.sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt)).slice(0,5),
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADMIN — CHANGE PASSWORD
+// ═══════════════════════════════════════════════════════════════════
+app.post('/api/admin/change-password', auth,(req,res)=>{
+  const {currentPassword,newPassword}=req.body;
+  if (currentPassword!==ADMIN.password) return res.status(400).json({error:'Current password incorrect.'});
+  if (!newPassword||newPassword.length<8) return res.status(400).json({error:'New password must be at least 8 characters.'});
+  ADMIN.password=newPassword;
+  res.json({success:true,message:'Password changed successfully! Update server.js to make it permanent.'});
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  FRONTEND
+// ═══════════════════════════════════════════════════════════════════
+app.get('/admin',(req,res)=>res.sendFile(path.join(ROOT,'public','admin.html')));
+app.get('/',(req,res)=>res.sendFile(path.join(ROOT,'public','index.html')));
+app.get('*',(req,res)=>{ if(req.path.startsWith('/api'))return res.status(404).json({error:'API endpoint not found.'}); res.sendFile(path.join(ROOT,'public','index.html')); });
+
+app.use((err,req,res,next)=>{ console.error(err); res.status(500).json({error:'Server error',details:err.message}); });
+
+app.listen(PORT,()=>{
+  console.log('\n╔══════════════════════════════════════════════╗');
+  console.log('║   GMT Tutorial Backend v2.0 — Running!       ║');
+  console.log('╠══════════════════════════════════════════════╣');
+  console.log(`║  🌐 Site  : http://localhost:${PORT}              ║`);
+  console.log(`║  🔧 Admin : http://localhost:${PORT}/admin        ║`);
+  console.log('║  👤 User  : gmt_admin                        ║');
+  console.log('║  🔑 Pass  : GMT@2026#Naresh                  ║');
+  console.log('║  📦 Max   : 100MB per file                   ║');
+  console.log('╚══════════════════════════════════════════════╝\n');
 });
