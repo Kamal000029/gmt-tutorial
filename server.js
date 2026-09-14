@@ -2,7 +2,9 @@
  * GMT Tutorial Backend v2.0
  * Genius Mathematics Tutorial — Naresh Kumar Yadav
  */
-
+require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const express = require('express');
 const multer  = require('multer');
 const path    = require('path');
@@ -13,7 +15,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 // ── Admin Credentials ──────────────────────────────────────────────────────
 const ADMIN = { username: 'gmt_admin', password: 'GMT@2026#Naresh' };
 
@@ -71,19 +77,38 @@ app.use(express.static(path.join(ROOT,'public')));
 app.use('/uploads', express.static(path.join(ROOT,'uploads')));
 
 // ── Multer ─────────────────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination(req,file,cb) {
+// // Cloudinary Storage Setup
+// // Cloudinary Storage Setup
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
     const cat = CATEGORIES[req.body.type] || CATEGORIES.pdf;
-    cb(null, path.join(ROOT,'uploads',cat.folder));
+    const ext = path.extname(file.originalname).toLowerCase();
+    const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
+    const finalFilename = `${base}_${Date.now()}`;
+
+    return {
+      folder: `gmt_uploads/${cat.folder || 'general'}`,
+      public_id: finalFilename,
+      resource_type: 'auto',
+    };
   },
-  filename(req,file,cb) {
-    const ext=path.extname(file.originalname).toLowerCase();
-    const base=path.basename(file.originalname,ext).replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,60);
-    cb(null,`${base}_${Date.now()}${ext}`);
-  }
 });
-const fileFilter=(req,file,cb)=>{ const ext=path.extname(file.originalname).toLowerCase(); ALL_EXTS.includes(ext)?cb(null,true):cb(new Error(`File type "${ext}" not allowed.`)); };
-const upload=multer({storage,fileFilter,limits:{fileSize:MAX_SIZE}});
+
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ALL_EXTS.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error(`File type "${ext}" not allowed.`));
+  }
+};
+
+const upload = multer({ 
+  storage: storage, 
+  fileFilter: fileFilter,
+  limits: { fileSize: MAX_SIZE } 
+});
 
 // ── Auth middleware ────────────────────────────────────────────────────────
 const auth=(req,res,next)=>{ if(req.session?.isAdmin) return next(); res.status(401).json({error:'Unauthorized'}); };
